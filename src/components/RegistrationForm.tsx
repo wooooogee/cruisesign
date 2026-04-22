@@ -140,8 +140,9 @@ const RegistrationForm = () => {
     }
     if (currentStep === 2) { // Payment Details step
       if (formData.paymentMethod === 'card') {
-        if (!formData.paymentInfo.cardNumber || !formData.paymentInfo.cardCompany || !formData.paymentInfo.cardExpiry) {
-          alert('카드 정보를 모두 입력해 주세요 (유효기간 포함).');
+        const pureCard = formData.paymentInfo.cardNumber.replace(/[^0-9]/g, '');
+        if (pureCard.length < 11 || !formData.paymentInfo.cardCompany || !formData.paymentInfo.cardExpiry) {
+          alert('카드 정보를 모두 정확히 입력해 주세요 (번호는 11~16자리 가능).');
           return;
         }
       } else {
@@ -256,28 +257,66 @@ const RegistrationForm = () => {
               </div>
 
               <div className="space-y-6">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <label className="text-xs font-bold text-zinc-400 ml-1 flex items-center gap-2"><Package size={14} /> 상품 선택</label>
-                    <select
-                      value={formData.product}
-                      onChange={(e) => updateFormData('product', e.target.value)}
-                      className="w-full bg-zinc-900 border border-zinc-800 rounded-2xl py-4 px-6 focus:border-indigo-500 transition-all outline-none text-white appearance-none"
-                    >
-                      <option value="더좋은크루즈">더좋은크루즈</option>
-                      <option value="좋은건강크루즈">좋은건강크루즈</option>
-                    </select>
+                <div className="space-y-3">
+                  <label className="text-xs font-bold text-zinc-400 ml-1 flex items-center gap-2"><Package size={14} /> 상품 선택</label>
+                  <div className="grid grid-cols-2 gap-4">
+                    {[
+                      { id: '더좋은크루즈', desc: '30회 선납형' },
+                      { id: '좋은건강크루즈', desc: '정기 납입형' }
+                    ].map((p) => (
+                      <button
+                        key={p.id}
+                        onClick={() => updateFormData('product', p.id)}
+                        className={`relative p-5 rounded-[2rem] border-2 text-left transition-all duration-300 group overflow-hidden ${
+                          formData.product === p.id 
+                            ? 'bg-indigo-500/10 border-indigo-500 shadow-lg shadow-indigo-500/10' 
+                            : 'bg-zinc-900/50 border-zinc-800 hover:border-zinc-700'
+                        }`}
+                      >
+                        <div className="relative z-10">
+                          <p className={`text-[10px] font-black uppercase tracking-tighter mb-1 ${
+                            formData.product === p.id ? 'text-indigo-400' : 'text-zinc-600'
+                          }`}>
+                            {p.desc}
+                          </p>
+                          <h4 className={`font-bold transition-colors ${
+                            formData.product === p.id ? 'text-white' : 'text-zinc-400'
+                          }`}>
+                            {p.id}
+                          </h4>
+                        </div>
+                        {formData.product === p.id && (
+                          <motion.div 
+                            layoutId="active-product"
+                            className="absolute -right-2 -top-2 bg-indigo-500 p-3 rounded-bl-3xl shadow-lg"
+                            initial={{ opacity: 0, scale: 0.5 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                          >
+                            <CheckCircle2 size={14} className="text-white" />
+                          </motion.div>
+                        )}
+                        <div className={`absolute inset-0 bg-gradient-to-br from-indigo-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity`} />
+                      </button>
+                    ))}
                   </div>
-                  <div className="space-y-2">
-                    <label className="text-xs font-bold text-zinc-400 ml-1 flex items-center gap-2"><Calculator size={14} /> 수량</label>
-                    <select
-                      value={formData.productCount}
-                      onChange={(e) => updateFormData('productCount', e.target.value)}
-                      className="w-full bg-zinc-900 border border-zinc-800 rounded-2xl py-4 px-6 focus:border-indigo-500 transition-all outline-none text-white appearance-none"
-                    >
-                      <option value="1">1 구좌</option>
-                      <option value="2">2 구좌</option>
-                    </select>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-xs font-bold text-zinc-400 ml-1 flex items-center gap-2"><Calculator size={14} /> 수량 선택</label>
+                  <div className="flex bg-zinc-900/50 p-1.5 rounded-2xl border border-zinc-800">
+                    {['1', '2'].map((n) => (
+                      <button
+                        key={n}
+                        onClick={() => updateFormData('productCount', n)}
+                        className={`flex-1 py-3 rounded-xl font-bold transition-all ${
+                          formData.productCount === n 
+                            ? 'bg-zinc-800 text-white shadow-sm ring-1 ring-white/5' 
+                            : 'text-zinc-600 hover:text-zinc-400'
+                        }`}
+                      >
+                        {n} 구좌
+                      </button>
+                    ))}
                   </div>
                 </div>
 
@@ -422,7 +461,24 @@ const RegistrationForm = () => {
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <label className="text-xs font-bold text-zinc-400 ml-1">카드번호</label>
-                        <input type="text" placeholder="0000-0000-0000-0000" value={formData.paymentInfo.cardNumber} onChange={(e) => updatePaymentInfo('cardNumber', e.target.value)} className="w-full bg-zinc-900 border border-zinc-800 rounded-2xl py-4.5 px-6 focus:border-indigo-500 transition-all outline-none text-white placeholder:text-zinc-800" />
+                        <input 
+                          type="text" 
+                          placeholder="0000-0000-0000-0000" 
+                          value={formData.paymentInfo.cardNumber} 
+                          onChange={(e) => {
+                            let val = e.target.value.replace(/[^0-9]/g, '');
+                            if (val.length > 16) val = val.substring(0, 16);
+                            
+                            // Formatting 4-4-4-4
+                            let formatted = '';
+                            for (let i = 0; i < val.length; i++) {
+                              if (i > 0 && i % 4 === 0) formatted += '-';
+                              formatted += val[i];
+                            }
+                            updatePaymentInfo('cardNumber', formatted);
+                          }} 
+                          className="w-full bg-zinc-900 border border-zinc-800 rounded-2xl py-4.5 px-6 focus:border-indigo-500 transition-all outline-none text-white placeholder:text-zinc-800 font-mono" 
+                        />
                       </div>
                       <div className="space-y-2">
                         <label className="text-xs font-bold text-zinc-400 ml-1 flex items-center gap-2"><Calendar size={14} /> 유효기간</label>
