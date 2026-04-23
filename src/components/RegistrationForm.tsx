@@ -251,7 +251,6 @@ const RegistrationForm = () => {
               exit={{ opacity: 0, x: -20 }}
               className="space-y-8 bg-zinc-900/40 p-8 rounded-[3rem] border border-white/5 shadow-2xl backdrop-blur-sm"
             >
-              <div className="space-y-1">
               <div className="space-y-1 pb-2 border-b border-white/5">
                 <h2 className="text-xl font-black text-white italic tracking-tight">{STEPS[currentStep].title}</h2>
               </div>
@@ -386,7 +385,6 @@ const RegistrationForm = () => {
               exit={{ opacity: 0, x: -20 }}
               className="space-y-8 bg-zinc-900/40 p-8 rounded-[3rem] border border-white/5 shadow-2xl backdrop-blur-sm"
             >
-              <div className="space-y-1">
               <div className="space-y-1 pb-2 border-b border-white/5">
                 <h2 className="text-xl font-black text-white italic tracking-tight">{STEPS[currentStep].title}</h2>
               </div>
@@ -445,7 +443,6 @@ const RegistrationForm = () => {
               exit={{ opacity: 0, x: -20 }}
               className="space-y-8 bg-zinc-900/40 p-8 rounded-[3rem] border border-white/5 shadow-2xl backdrop-blur-sm"
             >
-              <div className="space-y-1">
               <div className="space-y-1 pb-2 border-b border-white/5">
                 <h2 className="text-xl font-black text-white italic tracking-tight">{STEPS[currentStep].title}</h2>
               </div>
@@ -538,7 +535,6 @@ const RegistrationForm = () => {
               exit={{ opacity: 0, x: -20 }}
               className="space-y-8 bg-zinc-900/40 p-8 rounded-[3rem] border border-white/5 shadow-2xl backdrop-blur-sm"
             >
-              <div className="space-y-1">
               <div className="space-y-1 pb-2 border-b border-white/5">
                 <h2 className="text-xl font-black text-white italic tracking-tight">{STEPS[currentStep].title}</h2>
               </div>
@@ -562,7 +558,6 @@ const RegistrationForm = () => {
               exit={{ opacity: 0, x: -20 }}
               className="space-y-8 bg-zinc-900/40 p-8 rounded-[3rem] border border-white/5 shadow-2xl backdrop-blur-sm"
             >
-              <div className="space-y-1">
               <div className="space-y-1 pb-2 border-b border-white/5">
                 <h2 className="text-xl font-black text-white italic tracking-tight">{STEPS[currentStep].title}</h2>
               </div>
@@ -590,7 +585,6 @@ const RegistrationForm = () => {
               exit={{ opacity: 0, x: -20 }}
               className="space-y-8 bg-zinc-900/40 p-8 rounded-[3rem] border border-white/5 shadow-2xl backdrop-blur-sm"
             >
-              <div className="space-y-1">
               <div className="space-y-1 pb-2 border-b border-white/5">
                 <h2 className="text-xl font-black text-white italic tracking-tight">{STEPS[currentStep].title}</h2>
               </div>
