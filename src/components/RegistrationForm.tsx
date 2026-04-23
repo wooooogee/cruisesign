@@ -252,8 +252,8 @@ const RegistrationForm = () => {
               className="space-y-8 bg-zinc-900/40 p-8 rounded-[3rem] border border-white/5 shadow-2xl backdrop-blur-sm"
             >
               <div className="space-y-1">
-                <h2 className="text-2xl font-bold bg-gradient-to-r from-white to-zinc-400 bg-clip-text text-transparent italic">PRODUCT & BASIC INFO</h2>
-                <p className="text-zinc-500 text-sm">신청 상품과 구좌 수량을 선택해 주세요.</p>
+              <div className="space-y-1 pb-2 border-b border-white/5">
+                <h2 className="text-xl font-black text-white italic tracking-tight">{STEPS[currentStep].title}</h2>
               </div>
 
               <div className="space-y-6">
@@ -344,14 +344,18 @@ const RegistrationForm = () => {
                 <div className="space-y-2">
                   <label className="text-xs font-bold text-zinc-400 ml-1">주소</label>
                   <div className="flex flex-col gap-3">
-                    <div className="flex gap-2">
-                      <div className="relative flex-1 group">
-                        <MapPin className="absolute left-5 top-1/2 -translate-y-1/2 text-zinc-600 group-focus-within:text-indigo-400 transition-colors" size={18} />
-                        <input type="text" placeholder="주소 검색" value={formData.address} readOnly onClick={openPostcode} className="w-full bg-zinc-900/50 border border-zinc-800 rounded-2xl py-4.5 pl-14 pr-6 focus:border-indigo-500 transition-all outline-none text-white cursor-pointer placeholder:text-zinc-700" />
-                      </div>
-                      <button onClick={openPostcode} className="px-6 bg-white text-black rounded-2xl font-black hover:bg-zinc-200 transition-all active:scale-95 flex items-center gap-2 whitespace-nowrap"><Search size={18} /> 검색</button>
+                    <div className="relative group">
+                      <MapPin className="absolute left-5 top-1/2 -translate-y-1/2 text-zinc-600 group-focus-within:text-indigo-400 transition-colors" size={18} />
+                      <input 
+                        type="text" 
+                        placeholder="주소를 검색하려면 여기를 누르세요" 
+                        value={formData.address} 
+                        readOnly 
+                        onClick={openPostcode} 
+                        className="w-full bg-zinc-900/50 border border-zinc-800 rounded-2xl py-4.5 pl-14 pr-6 focus:border-indigo-500 transition-all outline-none text-white cursor-pointer placeholder:text-zinc-600 text-sm" 
+                      />
                     </div>
-                    <input type="text" placeholder="상세 주소" value={formData.addressDetail} onChange={(e) => updateFormData('addressDetail', e.target.value)} className="w-full bg-zinc-900/50 border border-zinc-800 rounded-2xl py-4.5 px-6 focus:border-indigo-500 transition-all outline-none text-white placeholder:text-zinc-700" />
+                    <input type="text" placeholder="상세 주소를 입력하세요" value={formData.addressDetail} onChange={(e) => updateFormData('addressDetail', e.target.value)} className="w-full bg-zinc-900/50 border border-zinc-800 rounded-2xl py-4.5 px-6 focus:border-indigo-500 transition-all outline-none text-white placeholder:text-zinc-700 text-sm" />
                   </div>
                 </div>
 
@@ -383,8 +387,8 @@ const RegistrationForm = () => {
               className="space-y-8 bg-zinc-900/40 p-8 rounded-[3rem] border border-white/5 shadow-2xl backdrop-blur-sm"
             >
               <div className="space-y-1">
-                <h2 className="text-2xl font-bold bg-gradient-to-r from-white to-zinc-400 bg-clip-text text-transparent italic">PRODUCT DETAILS</h2>
-                <p className="text-zinc-500 text-sm">선택하신 상품의 가입 정보 및 납입 플랜을 확인해 주세요.</p>
+              <div className="space-y-1 pb-2 border-b border-white/5">
+                <h2 className="text-xl font-black text-white italic tracking-tight">{STEPS[currentStep].title}</h2>
               </div>
 
               <div className="bg-zinc-900 border border-white/5 p-8 rounded-[2rem] space-y-6">
@@ -442,8 +446,8 @@ const RegistrationForm = () => {
               className="space-y-8 bg-zinc-900/40 p-8 rounded-[3rem] border border-white/5 shadow-2xl backdrop-blur-sm"
             >
               <div className="space-y-1">
-                <h2 className="text-2xl font-bold bg-gradient-to-r from-white to-zinc-400 bg-clip-text text-transparent italic">PAYMENT DETAILS</h2>
-                <p className="text-zinc-500 text-sm">대금 납입을 위한 상세 정보를 입력해 주세요.</p>
+              <div className="space-y-1 pb-2 border-b border-white/5">
+                <h2 className="text-xl font-black text-white italic tracking-tight">{STEPS[currentStep].title}</h2>
               </div>
 
               <div className="flex bg-zinc-900/50 p-1 rounded-2xl border border-zinc-800">
@@ -477,7 +481,7 @@ const RegistrationForm = () => {
                             }
                             updatePaymentInfo('cardNumber', formatted);
                           }} 
-                          className="w-full bg-zinc-900 border border-zinc-800 rounded-2xl py-4.5 px-6 focus:border-indigo-500 transition-all outline-none text-white placeholder:text-zinc-800 font-mono" 
+                          className="w-full bg-zinc-900 border border-zinc-800 rounded-2xl py-4.5 px-4 focus:border-indigo-500 transition-all outline-none text-white placeholder:text-zinc-800 font-mono text-sm sm:text-base tracking-tighter sm:tracking-normal" 
                         />
                       </div>
                       <div className="space-y-2">
@@ -535,8 +539,8 @@ const RegistrationForm = () => {
               className="space-y-8 bg-zinc-900/40 p-8 rounded-[3rem] border border-white/5 shadow-2xl backdrop-blur-sm"
             >
               <div className="space-y-1">
-                <h2 className="text-2xl font-bold bg-gradient-to-r from-white to-zinc-400 bg-clip-text text-transparent italic">TERMS & CONSENT</h2>
-                <p className="text-zinc-500 text-sm">주요 고지 사항 및 개인정보 이용에 동의해 주세요.</p>
+              <div className="space-y-1 pb-2 border-b border-white/5">
+                <h2 className="text-xl font-black text-white italic tracking-tight">{STEPS[currentStep].title}</h2>
               </div>
 
               <div className="bg-zinc-900/50 border border-white/5 rounded-[2rem] overflow-hidden max-h-[350px] overflow-y-auto px-4 shadow-inner">
@@ -559,8 +563,8 @@ const RegistrationForm = () => {
               className="space-y-8 bg-zinc-900/40 p-8 rounded-[3rem] border border-white/5 shadow-2xl backdrop-blur-sm"
             >
               <div className="space-y-1">
-                <h2 className="text-2xl font-bold bg-gradient-to-r from-white to-zinc-400 bg-clip-text text-transparent italic">DIGITAL SIGNATURE</h2>
-                <p className="text-zinc-500 text-sm">패드 중앙에 성함을 정자로 서명해 주세요.</p>
+              <div className="space-y-1 pb-2 border-b border-white/5">
+                <h2 className="text-xl font-black text-white italic tracking-tight">{STEPS[currentStep].title}</h2>
               </div>
 
               <div className="bg-white rounded-3xl overflow-hidden border-4 border-zinc-800 shadow-2xl">
@@ -587,8 +591,8 @@ const RegistrationForm = () => {
               className="space-y-8 bg-zinc-900/40 p-8 rounded-[3rem] border border-white/5 shadow-2xl backdrop-blur-sm"
             >
               <div className="space-y-1">
-                <h2 className="text-2xl font-bold bg-gradient-to-r from-white to-zinc-400 bg-clip-text text-transparent italic">SALES REPRESENTATIVE</h2>
-                <p className="text-zinc-500 text-sm">상담을 진행한 담당자의 성함과 소속을 확인해 주세요.</p>
+              <div className="space-y-1 pb-2 border-b border-white/5">
+                <h2 className="text-xl font-black text-white italic tracking-tight">{STEPS[currentStep].title}</h2>
               </div>
 
               <div className="space-y-4">
