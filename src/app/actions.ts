@@ -58,6 +58,7 @@ export async function registerAction(data: any) {
     console.log('--- Register Action Completed Successfully ---');
     return { 
       success: true, 
+      documentId: eformResult.document_id,
       message: '가입 신청 및 전자 서명이 완료되었습니다.' 
     };
   } catch (error: any) {

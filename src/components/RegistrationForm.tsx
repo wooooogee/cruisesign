@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { User, Phone, CheckCircle2, ArrowRight, ArrowLeft, Loader2, CreditCard, Landmark, ShieldCheck, MapPin, Search, Eraser, PenLine, Package, Calculator, Briefcase, Calendar } from 'lucide-react';
+import { User, Phone, CheckCircle2, ArrowRight, ArrowLeft, Loader2, CreditCard, Landmark, ShieldCheck, MapPin, Search, Eraser, PenLine, Package, Calculator, Briefcase, Calendar, Sun, Moon, FileText } from 'lucide-react';
 import SignatureCanvas from 'react-signature-canvas';
 import TermsAgreement from './TermsAgreement';
 import { registerAction } from '@/app/actions';
@@ -76,8 +76,24 @@ const STEPS = [
 const RegistrationForm = () => {
   const [currentStep, setCurrentStep] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submittingMessage, setSubmittingMessage] = useState('');
+  const [createdDocumentId, setCreatedDocumentId] = useState<string | null>(null);
+  const [theme, setTheme] = useState<'light' | 'dark'>('dark');
   const sigCanvas = useRef<SignatureCanvas>(null);
   
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' || 'dark';
+    setTheme(savedTheme);
+    document.documentElement.setAttribute('data-theme', savedTheme);
+  }, []);
+
+  const toggleTheme = () => {
+    const newTheme = theme === 'light' ? 'dark' : 'light';
+    setTheme(newTheme);
+    localStorage.setItem('theme', newTheme);
+    document.documentElement.setAttribute('data-theme', newTheme);
+  };
+
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
@@ -172,9 +188,18 @@ const RegistrationForm = () => {
 
   const handleSubmit = async () => {
     setIsSubmitting(true);
+    setSubmittingMessage('가입 신청서를 전송하고 있습니다...');
     try {
       const result = await registerAction(formData);
       if (result.success) {
+        setSubmittingMessage('계약서 PDF를 생성하고 있습니다. 잠시만 기다려 주세요...');
+        if (result.documentId) {
+          setCreatedDocumentId(result.documentId);
+          // PDF 생성을 위한 최소한의 시간 확보 (2초 뒤 오픈)
+          setTimeout(() => {
+            window.open(`/api/download?id=${result.documentId}`, '_blank');
+          }, 2000);
+        }
         setCurrentStep(6);
       } else {
         alert(result.message || '등록 중 오류가 발생했습니다.');
@@ -202,7 +227,7 @@ const RegistrationForm = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#0a0a0b] text-white flex flex-col items-center py-12 px-4 selection:bg-indigo-500/30">
+    <div className="min-h-screen bg-theme text-theme flex flex-col items-center py-12 px-4 selection:bg-indigo-500/30 transition-colors duration-300">
       <Script 
         src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js" 
         strategy="afterInteractive" 
@@ -212,34 +237,44 @@ const RegistrationForm = () => {
         <div className="flex items-center justify-between px-2">
           <div className="flex items-center gap-3">
             <div className="bg-indigo-500/10 p-2.5 rounded-2xl border border-indigo-500/20">
-              <ShieldCheck className="text-indigo-400" size={22} />
+              <ShieldCheck className="text-indigo-500" size={22} />
             </div>
             <div>
-              <p className="text-[10px] text-zinc-500 uppercase tracking-widest font-black">Membership System</p>
-              <p className="text-sm font-bold text-white italic">Premium Access Center</p>
+              <p className="text-[10px] text-sub uppercase tracking-widest font-black">Membership System</p>
+              <p className="text-sm font-bold italic">Premium Access Center</p>
             </div>
           </div>
-          <div className="px-3 py-1 bg-zinc-900 border border-zinc-800 rounded-full">
-            <span className="text-[10px] text-indigo-400 font-bold uppercase tracking-widest">Step {currentStep + 1} of 7</span>
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={toggleTheme}
+              className="p-3 rounded-2xl bg-card transition-all hover:scale-110 active:scale-95 border border-theme shadow-sm"
+              aria-label="Toggle Theme"
+            >
+              {theme === 'light' ? <Moon size={20} className="text-zinc-600" /> : <Sun size={20} className="text-yellow-400" />}
+            </button>
+            <div className="px-3 py-1 bg-card border border-theme rounded-full">
+              <span className="text-[10px] text-indigo-500 font-bold uppercase tracking-widest">Step {currentStep + 1} of 7</span>
+            </div>
           </div>
         </div>
 
-        <div className="relative flex justify-between items-center bg-zinc-900/50 border border-white/5 p-3 rounded-[2rem] backdrop-blur-xl">
+        <div className="relative flex justify-between items-center bg-card border border-theme p-3 rounded-[2rem] backdrop-blur-xl">
           {STEPS.slice(0, 6).map((step, idx) => (
             <div key={step.id} className="flex flex-col items-center flex-1 relative z-10">
               <div className={`w-8 h-8 rounded-xl flex items-center justify-center font-bold transition-all duration-500 ${
                 idx <= currentStep 
                 ? 'bg-gradient-to-br from-indigo-500 to-purple-600 text-white' 
-                : 'bg-zinc-800 text-zinc-600 border border-zinc-700'
+                : 'bg-theme text-sub border border-theme'
               }`}>
                 {idx < currentStep ? <CheckCircle2 size={16} /> : <span className="text-xs">{idx + 1}</span>}
               </div>
-              <span className={`text-[8px] mt-2 font-bold transition-colors duration-300 ${idx <= currentStep ? 'text-white' : 'text-zinc-600'}`}>
+              <span className={`text-[8px] mt-2 font-bold transition-colors duration-300 ${idx <= currentStep ? 'text-theme' : 'text-sub'}`}>
                 {step.title}
               </span>
             </div>
           ))}
-          <div className="absolute left-8 right-8 top-[1.8rem] h-[1px] bg-zinc-800 -z-0" />
+          <div className="absolute left-8 right-8 top-[1.8rem] h-[1px] bg-theme -z-0" />
         </div>
 
         <AnimatePresence mode="wait">
@@ -249,15 +284,15 @@ const RegistrationForm = () => {
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
-              className="space-y-8 bg-zinc-900/40 p-8 rounded-[3rem] border border-white/5 shadow-2xl backdrop-blur-sm"
+              className="space-y-8 card-theme p-8 rounded-[3rem] shadow-2xl backdrop-blur-sm"
             >
-              <div className="space-y-1 pb-2 border-b border-white/5">
-                <h2 className="text-xl font-black text-white italic tracking-tight">{STEPS[currentStep].title}</h2>
+              <div className="space-y-1 pb-2 border-b border-theme/10">
+                <h2 className="text-xl font-black italic tracking-tight">{STEPS[currentStep].title}</h2>
               </div>
 
               <div className="space-y-6">
                 <div className="space-y-3">
-                  <label className="text-xs font-bold text-zinc-400 ml-1 flex items-center gap-2"><Package size={14} /> 상품 선택</label>
+                  <label className="text-xs font-bold text-sub ml-1 flex items-center gap-2"><Package size={14} /> 상품 선택</label>
                   <div className="grid grid-cols-2 gap-4">
                     {[
                       { id: '더좋은크루즈', desc: '30회 선납형' },
@@ -269,17 +304,17 @@ const RegistrationForm = () => {
                         className={`relative p-5 rounded-[2rem] border-2 text-left transition-all duration-300 group overflow-hidden ${
                           formData.product === p.id 
                             ? 'bg-indigo-500/10 border-indigo-500 shadow-lg shadow-indigo-500/10' 
-                            : 'bg-zinc-900/50 border-zinc-800 hover:border-zinc-700'
+                            : 'bg-theme border-theme hover:border-indigo-300'
                         }`}
                       >
                         <div className="relative z-10">
                           <p className={`text-[10px] font-black uppercase tracking-tighter mb-1 ${
-                            formData.product === p.id ? 'text-indigo-400' : 'text-zinc-600'
+                            formData.product === p.id ? 'text-indigo-500' : 'text-sub'
                           }`}>
                             {p.desc}
                           </p>
                           <h4 className={`font-bold transition-colors ${
-                            formData.product === p.id ? 'text-white' : 'text-zinc-400'
+                            formData.product === p.id ? 'text-theme' : 'text-sub'
                           }`}>
                             {p.id}
                           </h4>
@@ -301,16 +336,16 @@ const RegistrationForm = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-xs font-bold text-zinc-400 ml-1 flex items-center gap-2"><Calculator size={14} /> 수량 선택</label>
-                  <div className="flex bg-zinc-900/50 p-1.5 rounded-2xl border border-zinc-800">
+                  <label className="text-xs font-bold text-sub ml-1 flex items-center gap-2"><Calculator size={14} /> 수량 선택</label>
+                  <div className="flex bg-card p-1.5 rounded-2xl border border-theme">
                     {['1', '2'].map((n) => (
                       <button
                         key={n}
                         onClick={() => updateFormData('productCount', n)}
                         className={`flex-1 py-3 rounded-xl font-bold transition-all ${
                           formData.productCount === n 
-                            ? 'bg-zinc-800 text-white shadow-sm ring-1 ring-white/5' 
-                            : 'text-zinc-600 hover:text-zinc-400'
+                            ? 'bg-indigo-600 text-white shadow-sm' 
+                            : 'text-sub hover:text-indigo-500'
                         }`}
                       >
                         {n} 구좌
@@ -320,54 +355,54 @@ const RegistrationForm = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-xs font-bold text-zinc-400 ml-1">성명</label>
+                  <label className="text-xs font-bold text-sub ml-1">성명</label>
                   <div className="relative group">
-                    <User className="absolute left-5 top-1/2 -translate-y-1/2 text-zinc-600 group-focus-within:text-indigo-400 transition-colors" size={18} />
-                    <input type="text" placeholder="실명을 입력하세요" value={formData.name} onChange={(e) => updateFormData('name', e.target.value)} className="w-full bg-zinc-900/50 border border-zinc-800 rounded-2xl py-4.5 pl-14 pr-6 focus:border-indigo-500 transition-all outline-none text-white placeholder:text-zinc-700" />
+                    <User className="absolute left-5 top-1/2 -translate-y-1/2 text-sub group-focus-within:text-indigo-500 transition-colors" size={18} />
+                    <input type="text" placeholder="실명을 입력하세요" value={formData.name} onChange={(e) => updateFormData('name', e.target.value)} className="w-full bg-theme border border-theme rounded-2xl py-4.5 pl-14 pr-6 focus:border-indigo-500 transition-all outline-none" />
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-xs font-bold text-zinc-400 ml-1">연락처</label>
+                  <label className="text-xs font-bold text-sub ml-1">연락처</label>
                   <div className="relative group">
-                    <Phone className="absolute left-5 top-1/2 -translate-y-1/2 text-zinc-600 group-focus-within:text-indigo-400 transition-colors" size={18} />
+                    <Phone className="absolute left-5 top-1/2 -translate-y-1/2 text-sub group-focus-within:text-indigo-500 transition-colors" size={18} />
                     <input type="tel" placeholder="010-0000-0000" value={formData.phone} onChange={(e) => {
                       let val = e.target.value.replace(/[^0-9]/g, '');
                       if (val.length > 3 && val.length <= 7) val = val.substring(0, 3) + '-' + val.substring(3);
                       else if (val.length > 7) val = val.substring(0, 3) + '-' + val.substring(3, 7) + '-' + val.substring(7, 11);
                       updateFormData('phone', val);
-                    }} className="w-full bg-zinc-900/50 border border-zinc-800 rounded-2xl py-4.5 pl-14 pr-6 focus:border-indigo-500 transition-all outline-none text-white placeholder:text-zinc-700" />
+                    }} className="w-full bg-theme border border-theme rounded-2xl py-4.5 pl-14 pr-6 focus:border-indigo-500 transition-all outline-none" />
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-xs font-bold text-zinc-400 ml-1">주소</label>
+                  <label className="text-xs font-bold text-sub ml-1">주소</label>
                   <div className="flex flex-col gap-3">
                     <div className="relative group">
-                      <MapPin className="absolute left-5 top-1/2 -translate-y-1/2 text-zinc-600 group-focus-within:text-indigo-400 transition-colors" size={18} />
+                      <MapPin className="absolute left-5 top-1/2 -translate-y-1/2 text-sub group-focus-within:text-indigo-500 transition-colors" size={18} />
                       <input 
                         type="text" 
                         placeholder="주소를 검색하려면 여기를 누르세요" 
                         value={formData.address} 
                         readOnly 
                         onClick={openPostcode} 
-                        className="w-full bg-zinc-900/50 border border-zinc-800 rounded-2xl py-4.5 pl-14 pr-6 focus:border-indigo-500 transition-all outline-none text-white cursor-pointer placeholder:text-zinc-600 text-sm" 
+                        className="w-full bg-theme border border-theme rounded-2xl py-4.5 pl-14 pr-6 focus:border-indigo-500 transition-all outline-none cursor-pointer text-sm" 
                       />
                     </div>
-                    <input type="text" placeholder="상세 주소를 입력하세요" value={formData.addressDetail} onChange={(e) => updateFormData('addressDetail', e.target.value)} className="w-full bg-zinc-900/50 border border-zinc-800 rounded-2xl py-4.5 px-6 focus:border-indigo-500 transition-all outline-none text-white placeholder:text-zinc-700 text-sm" />
+                    <input type="text" placeholder="상세 주소를 입력하세요" value={formData.addressDetail} onChange={(e) => updateFormData('addressDetail', e.target.value)} className="w-full bg-theme border border-theme rounded-2xl py-4.5 px-6 focus:border-indigo-500 transition-all outline-none text-sm" />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <label className="text-xs font-bold text-zinc-400 ml-1">주민등록번호 앞6자리</label>
-                    <input type="text" placeholder="900101" maxLength={6} value={formData.residentId} onChange={(e) => updateFormData('residentId', e.target.value.replace(/[^0-9]/g, ''))} className="w-full bg-zinc-900/50 border border-zinc-800 rounded-2xl py-4.5 px-6 focus:border-indigo-500 transition-all outline-none text-white font-mono tracking-[0.2em] placeholder:text-zinc-700" />
+                    <label className="text-xs font-bold text-sub ml-1">주민등록번호 앞6자리</label>
+                    <input type="text" placeholder="900101" maxLength={6} value={formData.residentId} onChange={(e) => updateFormData('residentId', e.target.value.replace(/[^0-9]/g, ''))} className="w-full bg-theme border border-theme rounded-2xl py-4.5 px-6 focus:border-indigo-500 transition-all outline-none font-mono tracking-[0.2em]" />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-xs font-bold text-zinc-400 ml-1">성별</label>
-                    <div className="flex bg-zinc-900/50 p-1 rounded-2xl border border-zinc-800">
-                      <button onClick={() => updateFormData('gender', '남')} className={`flex-1 py-3 rounded-xl font-bold transition-all ${formData.gender === '남' ? 'bg-zinc-800 text-white shadow-sm' : 'text-zinc-600 hover:text-zinc-400'}`}>남성</button>
-                      <button onClick={() => updateFormData('gender', '여')} className={`flex-1 py-3 rounded-xl font-bold transition-all ${formData.gender === '여' ? 'bg-zinc-800 text-white shadow-sm' : 'text-zinc-600 hover:text-zinc-400'}`}>여성</button>
+                    <label className="text-xs font-bold text-sub ml-1">성별</label>
+                    <div className="flex bg-card p-1 rounded-2xl border border-theme">
+                      <button onClick={() => updateFormData('gender', '남')} className={`flex-1 py-3 rounded-xl font-bold transition-all ${formData.gender === '남' ? 'bg-indigo-600 text-white shadow-sm' : 'text-sub hover:text-indigo-500'}`}>남성</button>
+                      <button onClick={() => updateFormData('gender', '여')} className={`flex-1 py-3 rounded-xl font-bold transition-all ${formData.gender === '여' ? 'bg-indigo-600 text-white shadow-sm' : 'text-sub hover:text-indigo-500'}`}>여성</button>
                     </div>
                   </div>
                 </div>
@@ -383,43 +418,43 @@ const RegistrationForm = () => {
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
-              className="space-y-8 bg-zinc-900/40 p-8 rounded-[3rem] border border-white/5 shadow-2xl backdrop-blur-sm"
+              className="space-y-8 card-theme p-8 rounded-[3rem] shadow-2xl backdrop-blur-sm"
             >
-              <div className="space-y-1 pb-2 border-b border-white/5">
-                <h2 className="text-xl font-black text-white italic tracking-tight">{STEPS[currentStep].title}</h2>
+              <div className="space-y-1 pb-2 border-b border-theme/10">
+                <h2 className="text-xl font-black italic tracking-tight">{STEPS[currentStep].title}</h2>
               </div>
 
-              <div className="bg-zinc-900 border border-white/5 p-8 rounded-[2rem] space-y-6">
+              <div className="bg-card border border-theme p-8 rounded-[2rem] space-y-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-[10px] text-indigo-400 font-black uppercase tracking-widest">Selected Product</p>
+                    <p className="text-[10px] text-indigo-500 font-black uppercase tracking-widest">Selected Product</p>
                     <h3 className="text-xl font-black italic">{formData.product} ({formData.productCount}구좌)</h3>
                   </div>
-                  <div className="bg-indigo-500/10 px-4 py-2 rounded-xl border border-indigo-500/20 font-bold text-indigo-400">
+                  <div className="bg-indigo-500/10 px-4 py-2 rounded-xl border border-indigo-500/20 font-bold text-indigo-500">
                     {formData.product === '더좋은크루즈' ? '30회 선납형' : '정기 납입형'}
                   </div>
                 </div>
 
                 <div className="space-y-3">
-                  <div className="flex justify-between items-center p-4 bg-zinc-800/50 rounded-2xl border border-white/5">
-                    <span className="text-zinc-400 text-xs font-bold">1회차 결제금액</span>
-                    <span className="text-white font-black">
+                  <div className="flex justify-between items-center p-4 bg-theme rounded-2xl border border-theme">
+                    <span className="text-sub text-xs font-bold">1회차 결제금액</span>
+                    <span className="font-black">
                       {formData.product === '더좋은크루즈' 
                         ? (990000 * Number(formData.productCount)).toLocaleString() 
                         : (660000 * Number(formData.productCount)).toLocaleString()
                       }원
                     </span>
                   </div>
-                  <div className="flex justify-between items-center p-4 bg-zinc-800/50 rounded-2xl border border-white/5">
-                    <span className="text-zinc-400 text-xs font-bold">2회차 이후 월 납입금</span>
-                    <span className="text-white font-black text-indigo-400">
+                  <div className="flex justify-between items-center p-4 bg-theme rounded-2xl border border-theme">
+                    <span className="text-sub text-xs font-bold">2회차 이후 월 납입금</span>
+                    <span className="font-black text-indigo-500">
                       {formData.product === '더좋은크루즈' 
                         ? (33000 * Number(formData.productCount)).toLocaleString() 
                         : (27000 * Number(formData.productCount)).toLocaleString()
                       }원
                     </span>
                   </div>
-                  <p className="text-[10px] text-zinc-600 text-right px-2">
+                  <p className="text-[10px] text-sub text-right px-2">
                     {formData.product === '더좋은크루즈' 
                       ? '* 2회차~71회차까지 납입 (총액 330만원)' 
                       : '* 2회차~101회차까지 납입 (VAT 포함)'
@@ -429,8 +464,8 @@ const RegistrationForm = () => {
               </div>
 
               <div className="flex gap-3 pt-4">
-                <button onClick={handleBack} className="flex-1 py-5 bg-zinc-800 text-zinc-300 rounded-2xl font-bold">이전</button>
-                <button onClick={handleNext} className="flex-[2] py-5 bg-white text-black rounded-2xl font-black">결제 정보 입력 단계</button>
+                <button onClick={handleBack} className="flex-1 py-5 bg-card text-sub rounded-2xl font-bold border border-theme">이전</button>
+                <button onClick={handleNext} className="flex-[2] py-5 bg-indigo-600 text-white rounded-2xl font-black">결제 정보 입력 단계</button>
               </div>
             </motion.div>
           )}
@@ -441,27 +476,27 @@ const RegistrationForm = () => {
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
-              className="space-y-8 bg-zinc-900/40 p-8 rounded-[3rem] border border-white/5 shadow-2xl backdrop-blur-sm"
+              className="space-y-8 card-theme p-8 rounded-[3rem] shadow-2xl backdrop-blur-sm"
             >
-              <div className="space-y-1 pb-2 border-b border-white/5">
-                <h2 className="text-xl font-black text-white italic tracking-tight">{STEPS[currentStep].title}</h2>
+              <div className="space-y-1 pb-2 border-b border-theme/10">
+                <h2 className="text-xl font-black italic tracking-tight">{STEPS[currentStep].title}</h2>
               </div>
 
-              <div className="flex bg-zinc-900/50 p-1 rounded-2xl border border-zinc-800">
-                <button onClick={() => updateFormData('paymentMethod', 'card')} className={`flex-1 py-3 rounded-xl font-bold transition-all ${formData.paymentMethod === 'card' ? 'bg-zinc-800 text-white shadow-sm' : 'text-zinc-600 hover:text-zinc-400'}`}>카드 결제</button>
-                <button onClick={() => updateFormData('paymentMethod', 'bank')} className={`flex-1 py-3 rounded-xl font-bold transition-all ${formData.paymentMethod === 'bank' ? 'bg-zinc-800 text-white shadow-sm' : 'text-zinc-600 hover:text-zinc-400'}`}>계좌 이체(CMS)</button>
+              <div className="flex bg-card p-1 rounded-2xl border border-theme">
+                <button onClick={() => updateFormData('paymentMethod', 'card')} className={`flex-1 py-3 rounded-xl font-bold transition-all ${formData.paymentMethod === 'card' ? 'bg-indigo-600 text-white shadow-sm' : 'text-sub hover:text-indigo-500'}`}>카드 결제</button>
+                <button onClick={() => updateFormData('paymentMethod', 'bank')} className={`flex-1 py-3 rounded-xl font-bold transition-all ${formData.paymentMethod === 'bank' ? 'bg-indigo-600 text-white shadow-sm' : 'text-sub hover:text-indigo-500'}`}>계좌 이체(CMS)</button>
               </div>
 
               <div className="space-y-4">
                 {formData.paymentMethod === 'card' ? (
                   <div className="space-y-4">
                     <div className="space-y-2">
-                      <label className="text-xs font-bold text-zinc-400 ml-1 flex items-center gap-2"><CreditCard size={14} /> 카드사</label>
-                      <input type="text" placeholder="예: 현대카드" value={formData.paymentInfo.cardCompany} onChange={(e) => updatePaymentInfo('cardCompany', e.target.value)} className="w-full bg-zinc-900 border border-zinc-800 rounded-2xl py-4.5 px-6 focus:border-indigo-500 transition-all outline-none text-white placeholder:text-zinc-800" />
+                      <label className="text-xs font-bold text-sub ml-1 flex items-center gap-2"><CreditCard size={14} /> 카드사</label>
+                      <input type="text" placeholder="예: 현대카드" value={formData.paymentInfo.cardCompany} onChange={(e) => updatePaymentInfo('cardCompany', e.target.value)} className="w-full bg-theme border border-theme rounded-2xl py-4.5 px-6 focus:border-indigo-500 transition-all outline-none" />
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2">
-                        <label className="text-xs font-bold text-zinc-400 ml-1">카드번호</label>
+                        <label className="text-xs font-bold text-sub ml-1">카드번호</label>
                         <input 
                           type="text" 
                           placeholder="0000-0000-0000-0000" 
@@ -478,11 +513,11 @@ const RegistrationForm = () => {
                             }
                             updatePaymentInfo('cardNumber', formatted);
                           }} 
-                          className="w-full bg-zinc-900 border border-zinc-800 rounded-2xl py-4.5 px-4 focus:border-indigo-500 transition-all outline-none text-white placeholder:text-zinc-800 font-mono text-sm sm:text-base tracking-tighter sm:tracking-normal" 
+                          className="w-full bg-theme border border-theme rounded-2xl py-4.5 px-4 focus:border-indigo-500 transition-all outline-none font-mono text-sm sm:text-base tracking-tighter sm:tracking-normal" 
                         />
                       </div>
                       <div className="space-y-2">
-                        <label className="text-xs font-bold text-zinc-400 ml-1 flex items-center gap-2"><Calendar size={14} /> 유효기간</label>
+                        <label className="text-xs font-bold text-sub ml-1 flex items-center gap-2"><Calendar size={14} /> 유효기간</label>
                         <input 
                           type="text" 
                           placeholder="MM/YY" 
@@ -493,7 +528,7 @@ const RegistrationForm = () => {
                             if (val.length > 2) val = val.substring(0, 2) + '/' + val.substring(2, 4);
                             updatePaymentInfo('cardExpiry', val);
                           }} 
-                          className="w-full bg-zinc-900 border border-zinc-800 rounded-2xl py-4.5 px-6 focus:border-indigo-500 transition-all outline-none text-white placeholder:text-zinc-800" 
+                          className="w-full bg-theme border border-theme rounded-2xl py-4.5 px-6 focus:border-indigo-500 transition-all outline-none" 
                         />
                       </div>
                     </div>
@@ -501,18 +536,18 @@ const RegistrationForm = () => {
                 ) : (
                   <div className="space-y-4">
                     <div className="space-y-2">
-                      <label className="text-xs font-bold text-zinc-400 ml-1 flex items-center gap-2"><Landmark size={14} /> 은행명</label>
-                      <input type="text" placeholder="예: 국민은행" value={formData.paymentInfo.bankName} onChange={(e) => updatePaymentInfo('bankName', e.target.value)} className="w-full bg-zinc-900 border border-zinc-800 rounded-2xl py-4.5 px-6 focus:border-indigo-500 transition-all outline-none text-white placeholder:text-zinc-800" />
+                      <label className="text-xs font-bold text-sub ml-1 flex items-center gap-2"><Landmark size={14} /> 은행명</label>
+                      <input type="text" placeholder="예: 국민은행" value={formData.paymentInfo.bankName} onChange={(e) => updatePaymentInfo('bankName', e.target.value)} className="w-full bg-theme border border-theme rounded-2xl py-4.5 px-6 focus:border-indigo-500 transition-all outline-none" />
                     </div>
                     <div className="space-y-2">
-                      <label className="text-xs font-bold text-zinc-400 ml-1">계좌번호</label>
-                      <input type="text" placeholder="'-' 없이 숫자만" value={formData.paymentInfo.accountNumber} onChange={(e) => updatePaymentInfo('accountNumber', e.target.value)} className="w-full bg-zinc-900 border border-zinc-800 rounded-2xl py-4.5 px-6 focus:border-indigo-500 transition-all outline-none text-white placeholder:text-zinc-800" />
+                      <label className="text-xs font-bold text-sub ml-1">계좌번호</label>
+                      <input type="text" placeholder="'-' 없이 숫자만" value={formData.paymentInfo.accountNumber} onChange={(e) => updatePaymentInfo('accountNumber', e.target.value)} className="w-full bg-theme border border-theme rounded-2xl py-4.5 px-6 focus:border-indigo-500 transition-all outline-none" />
                     </div>
                   </div>
                 )}
                 <div className="space-y-2">
-                  <label className="text-xs font-bold text-zinc-400 ml-1">매월 결제일</label>
-                  <select value={formData.paymentDate} onChange={(e) => updateFormData('paymentDate', e.target.value)} className="w-full bg-zinc-900 border border-zinc-800 rounded-2xl py-4.5 px-6 focus:border-indigo-500 transition-all outline-none text-white appearance-none">
+                  <label className="text-xs font-bold text-sub ml-1">매월 결제일</label>
+                  <select value={formData.paymentDate} onChange={(e) => updateFormData('paymentDate', e.target.value)} className="w-full bg-theme border border-theme rounded-2xl py-4.5 px-6 focus:border-indigo-500 transition-all outline-none appearance-none">
                     <option value="5">매월 5일</option>
                     <option value="15">매월 15일</option>
                     <option value="25">매월 25일</option>
@@ -521,8 +556,8 @@ const RegistrationForm = () => {
               </div>
 
               <div className="flex gap-3 pt-4">
-                <button onClick={handleBack} className="flex-1 py-5 bg-zinc-800 text-zinc-300 rounded-2xl font-bold">이전</button>
-                <button onClick={handleNext} className="flex-[2] py-5 bg-white text-black rounded-2xl font-black">약관 동의 단계</button>
+                <button onClick={handleBack} className="flex-1 py-5 bg-card text-sub rounded-2xl font-bold border border-theme">이전</button>
+                <button onClick={handleNext} className="flex-[2] py-5 bg-indigo-600 text-white rounded-2xl font-black">약관 동의 단계</button>
               </div>
             </motion.div>
           )}
@@ -533,19 +568,19 @@ const RegistrationForm = () => {
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
-              className="space-y-8 bg-zinc-900/40 p-8 rounded-[3rem] border border-white/5 shadow-2xl backdrop-blur-sm"
+              className="space-y-8 card-theme p-8 rounded-[3rem] shadow-2xl backdrop-blur-sm"
             >
-              <div className="space-y-1 pb-2 border-b border-white/5">
-                <h2 className="text-xl font-black text-white italic tracking-tight">{STEPS[currentStep].title}</h2>
+              <div className="space-y-1 pb-2 border-b border-theme/10">
+                <h2 className="text-xl font-black italic tracking-tight">{STEPS[currentStep].title}</h2>
               </div>
 
-              <div className="bg-zinc-900/50 border border-white/5 rounded-[2rem] overflow-hidden max-h-[350px] overflow-y-auto px-4 shadow-inner">
+              <div className="bg-card border border-theme rounded-[2rem] overflow-hidden max-h-[350px] overflow-y-auto px-4 shadow-inner">
                 <TermsAgreement terms={DEFAULT_TERMS} onAgreementChange={(agreement) => updateFormData('agreement', agreement)} />
               </div>
 
               <div className="flex gap-3 pt-4">
-                <button onClick={handleBack} className="flex-1 py-5 bg-zinc-800 text-zinc-300 rounded-2xl font-bold">이전</button>
-                <button onClick={handleNext} className="flex-[2] py-5 bg-white text-black rounded-2xl font-black">전자 서명 단계</button>
+                <button onClick={handleBack} className="flex-1 py-5 bg-card text-sub rounded-2xl font-bold border border-theme">이전</button>
+                <button onClick={handleNext} className="flex-[2] py-5 bg-indigo-600 text-white rounded-2xl font-black">전자 서명 단계</button>
               </div>
             </motion.div>
           )}
@@ -556,22 +591,22 @@ const RegistrationForm = () => {
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
-              className="space-y-8 bg-zinc-900/40 p-8 rounded-[3rem] border border-white/5 shadow-2xl backdrop-blur-sm"
+              className="space-y-8 card-theme p-8 rounded-[3rem] shadow-2xl backdrop-blur-sm"
             >
-              <div className="space-y-1 pb-2 border-b border-white/5">
-                <h2 className="text-xl font-black text-white italic tracking-tight">{STEPS[currentStep].title}</h2>
+              <div className="space-y-1 pb-2 border-b border-theme/10">
+                <h2 className="text-xl font-black italic tracking-tight">{STEPS[currentStep].title}</h2>
               </div>
 
-              <div className="bg-white rounded-3xl overflow-hidden border-4 border-zinc-800 shadow-2xl">
+              <div className="bg-white rounded-3xl overflow-hidden border-4 border-theme shadow-2xl">
                 <SignatureCanvas ref={sigCanvas} penColor="black" canvasProps={{ className: "signature-canvas w-full h-64" }} />
               </div>
               <div className="flex justify-between items-center px-2">
-                <button onClick={clearSignature} className="flex items-center gap-2 text-xs font-bold text-zinc-500 hover:text-indigo-400 transition-colors"><Eraser size={14} /> 서명 초기화</button>
-                <div className="text-[10px] text-zinc-600 font-black uppercase tracking-widest flex items-center gap-2"><PenLine size={12} className="text-indigo-500" /> Secure Input Active</div>
+                <button onClick={clearSignature} className="flex items-center gap-2 text-xs font-bold text-sub hover:text-indigo-500 transition-colors"><Eraser size={14} /> 서명 초기화</button>
+                <div className="text-[10px] text-sub font-black uppercase tracking-widest flex items-center gap-2"><PenLine size={12} className="text-indigo-500" /> Secure Input Active</div>
               </div>
 
               <div className="flex gap-3 pt-4">
-                <button onClick={handleBack} className="flex-1 py-5 bg-zinc-800 text-zinc-300 rounded-2xl font-bold">이전</button>
+                <button onClick={handleBack} className="flex-1 py-5 bg-card text-sub rounded-2xl font-bold border border-theme">이전</button>
                 <button onClick={handleNext} className="flex-[2] py-5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-2xl font-black shadow-lg shadow-indigo-500/20">서명 완료</button>
               </div>
             </motion.div>
@@ -583,35 +618,35 @@ const RegistrationForm = () => {
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
-              className="space-y-8 bg-zinc-900/40 p-8 rounded-[3rem] border border-white/5 shadow-2xl backdrop-blur-sm"
+              className="space-y-8 card-theme p-8 rounded-[3rem] shadow-2xl backdrop-blur-sm"
             >
-              <div className="space-y-1 pb-2 border-b border-white/5">
-                <h2 className="text-xl font-black text-white italic tracking-tight">{STEPS[currentStep].title}</h2>
+              <div className="space-y-1 pb-2 border-b border-theme/10">
+                <h2 className="text-xl font-black italic tracking-tight">{STEPS[currentStep].title}</h2>
               </div>
 
               <div className="space-y-4">
                 <div className="space-y-2">
-                  <label className="text-xs font-bold text-zinc-400 ml-1 flex items-center gap-2"><Briefcase size={14} /> 소속</label>
-                  <input type="text" placeholder="영업사원의 소속을 입력하세요" value={formData.salesAffiliation} onChange={(e) => updateFormData('salesAffiliation', e.target.value)} className="w-full bg-zinc-900 border border-zinc-800 rounded-2xl py-4.5 px-8 outline-none text-white focus:border-indigo-500 placeholder:text-zinc-800" />
+                  <label className="text-xs font-bold text-sub ml-1 flex items-center gap-2"><Briefcase size={14} /> 소속</label>
+                  <input type="text" placeholder="영업사원의 소속을 입력하세요" value={formData.salesAffiliation} onChange={(e) => updateFormData('salesAffiliation', e.target.value)} className="w-full bg-theme border border-theme rounded-2xl py-4.5 px-8 outline-none focus:border-indigo-500" />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-xs font-bold text-zinc-400 ml-1">사원 성함</label>
-                  <input type="text" placeholder="성명을 입력하세요" value={formData.salesName} onChange={(e) => updateFormData('salesName', e.target.value)} className="w-full bg-zinc-900 border border-zinc-800 rounded-2xl py-4.5 px-8 outline-none text-white focus:border-indigo-500 placeholder:text-zinc-800" />
+                  <label className="text-xs font-bold text-sub ml-1">사원 성함</label>
+                  <input type="text" placeholder="성명을 입력하세요" value={formData.salesName} onChange={(e) => updateFormData('salesName', e.target.value)} className="w-full bg-theme border border-theme rounded-2xl py-4.5 px-8 outline-none focus:border-indigo-500" />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-xs font-bold text-zinc-400 ml-1">사원 연락처</label>
+                  <label className="text-xs font-bold text-sub ml-1">사원 연락처</label>
                   <input type="tel" placeholder="010-0000-0000" value={formData.salesPhone} onChange={(e) => {
                     let val = e.target.value.replace(/[^0-9]/g, '');
                     if (val.length > 3 && val.length <= 7) val = val.substring(0, 3) + '-' + val.substring(3);
                     else if (val.length > 7) val = val.substring(0, 3) + '-' + val.substring(3, 7) + '-' + val.substring(7, 11);
                     updateFormData('salesPhone', val);
-                  }} className="w-full bg-zinc-900 border border-zinc-800 rounded-2xl py-4.5 px-8 outline-none text-white focus:border-indigo-500 placeholder:text-zinc-800" />
+                  }} className="w-full bg-theme border border-theme rounded-2xl py-4.5 px-8 outline-none focus:border-indigo-500" />
                 </div>
               </div>
 
               <div className="flex gap-3 pt-4">
-                <button onClick={handleBack} className="flex-1 py-5 bg-zinc-800 text-zinc-300 rounded-2xl font-bold">이전</button>
-                <button onClick={handleNext} disabled={isSubmitting} className="flex-[2] py-5 bg-white text-black disabled:bg-zinc-800 rounded-2xl font-black flex items-center justify-center shadow-xl">
+                <button onClick={handleBack} className="flex-1 py-5 bg-card text-sub rounded-2xl font-bold border border-theme">이전</button>
+                <button onClick={handleNext} disabled={isSubmitting} className="flex-[2] py-5 bg-indigo-600 text-white disabled:bg-zinc-800 rounded-2xl font-black flex items-center justify-center shadow-xl">
                   {isSubmitting ? <Loader2 className="animate-spin" size={24} /> : '최종 신청하기'}
                 </button>
               </div>
@@ -629,14 +664,28 @@ const RegistrationForm = () => {
               <div className="inline-flex w-24 h-24 bg-white/20 rounded-[2.5rem] items-center justify-center mb-2 animate-bounce"><CheckCircle2 className="text-white" size={48} /></div>
               <div className="space-y-4">
                 <h2 className="text-3xl font-black text-white italic tracking-tighter leading-tight">회원가입신청서 작성완료</h2>
+                {createdDocumentId && (
+                  <p className="text-indigo-100 text-sm font-medium">잠시 후 계약서 PDF가 자동으로 열립니다.</p>
+                )}
               </div>
-              <button onClick={() => window.location.reload()} className="w-full py-5 bg-white text-indigo-900 rounded-[2rem] font-black hover:shadow-2xl hover:scale-[1.02] transition-all">신규 회원가입신청서 작성</button>
+              
+              <div className="flex flex-col gap-3">
+                {createdDocumentId && (
+                  <button 
+                    onClick={() => window.open(`/api/download?id=${createdDocumentId}`, '_blank')}
+                    className="w-full py-5 bg-indigo-500 text-white rounded-[2rem] font-black border border-white/20 hover:bg-indigo-400 transition-all flex items-center justify-center gap-2"
+                  >
+                    <FileText size={20} /> 계약서 PDF 다운로드
+                  </button>
+                )}
+                <button onClick={() => window.location.reload()} className="w-full py-5 bg-white text-indigo-900 rounded-[2rem] font-black hover:shadow-2xl hover:scale-[1.02] transition-all">신규 회원가입신청서 작성</button>
+              </div>
             </motion.div>
           )}
         </AnimatePresence>
       </div>
 
-      <footer className="mt-20 text-[10px] text-zinc-700 font-bold uppercase tracking-[0.5em] opacity-40 italic">Premium Membership Platform // Advanced Digital Signing</footer>
+      <footer className="mt-20 text-[10px] text-sub font-bold uppercase tracking-[0.5em] opacity-40 italic">Premium Membership Platform // Advanced Digital Signing</footer>
     </div>
   );
 };

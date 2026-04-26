@@ -11,7 +11,7 @@ const EFORMSIGN_TEMPLATE_ID_HEALTH = process.env.EFORMSIGN_TEMPLATE_ID_HEALTH ||
  * Get Access Token using the specific 'Bearer' Header pattern found in Postman.
  * This pattern is used when the Secret Key is a simple string like 'test'.
  */
-async function getEformsignToken(): Promise<string> {
+export async function getEformsignToken(): Promise<string> {
     const timestamp = Date.now().toString();
     const apiKeyBase64 = Buffer.from(EFORMSIGN_API_KEY).toString('base64');
 
