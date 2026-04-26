@@ -130,3 +130,79 @@ export async function addRegistrationToSheet(data: any) {
     throw error;
   }
 }
+
+export async function getRegistrationByContact(name: string, phone: string) {
+  if (!GOOGLE_SERVICE_ACCOUNT_EMAIL || !GOOGLE_PRIVATE_KEY) {
+    console.warn('Google Sheets credentials are not set.');
+    return { success: false, error: 'credentials_missing' };
+  }
+
+  try {
+    const serviceAccountAuth = new JWT({
+      email: GOOGLE_SERVICE_ACCOUNT_EMAIL,
+      key: GOOGLE_PRIVATE_KEY,
+      scopes: ['https://www.googleapis.com/auth/spreadsheets'],
+    });
+
+    const doc = new GoogleSpreadsheet(SPREADSHEET_ID, serviceAccountAuth);
+    await doc.loadInfo();
+
+    const sheet = doc.sheetsByTitle['신청현황'];
+    if (!sheet) {
+      return { success: false, error: 'sheet_not_found' };
+    }
+
+    const rows = await sheet.getRows();
+    
+    // Find the latest entry (search from the end)
+    const foundRow = [...rows].reverse().find(row => {
+      const rowName = row.get('성명');
+      const rowPhone = row.get('연락처');
+      return rowName === name && (rowPhone === phone || rowPhone?.replace(/-/g, '') === phone.replace(/-/g, ''));
+    });
+
+    if (!foundRow) {
+      return { success: false, error: 'not_found' };
+    }
+
+    // Parse Sales Rep Info: "Name (Phone)"
+    const salesInfoRaw = foundRow.get('영업담당') || '';
+    let salesName = '';
+    let salesPhone = '';
+    const salesMatch = salesInfoRaw.match(/^(.+)\s\((.+)\)$/);
+    if (salesMatch) {
+      salesName = salesMatch[1].trim();
+      salesPhone = salesMatch[2].trim();
+    } else {
+      salesName = salesInfoRaw;
+    }
+
+    const data = {
+      name: foundRow.get('성명') || '',
+      gender: foundRow.get('성별') || '남',
+      phone: foundRow.get('연락처') || '',
+      address: foundRow.get('주소') || '',
+      residentId: foundRow.get('주민번호앞자리') || '',
+      product: foundRow.get('상품명') || '더좋은크루즈',
+      productCount: (foundRow.get('수량') || '1').replace('구좌', ''),
+      paymentPlan: foundRow.get('플랜') === '30회 선납' ? 'prepaid' : 'normal',
+      paymentMethod: foundRow.get('결제수단') === '카드' ? 'card' : 'bank',
+      paymentInfo: {
+        cardCompany: foundRow.get('결제수단') === '카드' ? foundRow.get('결제기관') : '',
+        cardNumber: foundRow.get('결제수단') === '카드' ? foundRow.get('계좌/카드번호') : '',
+        cardExpiry: foundRow.get('결제수단') === '카드' ? foundRow.get('유효기간') : '',
+        bankName: foundRow.get('결제수단') !== '카드' ? foundRow.get('결제기관') : '',
+        accountNumber: foundRow.get('결제수단') !== '카드' ? foundRow.get('계좌/카드번호') : '',
+        accountHolder: foundRow.get('예금주') || '',
+      },
+      salesAffiliation: foundRow.get('영업소속') || '',
+      salesName,
+      salesPhone,
+    };
+
+    return { success: true, data };
+  } catch (error) {
+    console.error('Error fetching registration:', error);
+    return { success: false, error: 'internal_error' };
+  }
+}

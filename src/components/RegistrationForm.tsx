@@ -9,19 +9,19 @@ import { registerAction } from '@/app/actions';
 import Script from 'next/script';
 
 const DEFAULT_TERMS = [
-  { 
-    id: 'product_notice', 
-    title: '1. 상품내용 고지에 대한 동의 (필수)', 
+  {
+    id: 'product_notice',
+    title: '1. 상품내용 고지에 대한 동의 (필수)',
     content: `본 신청과 관련하여 계약자 본인은 상기 금융거래정보(카드 정보, 은행, 계좌번호 등)를 만기·해지 신청 때까지 청구 기관에 제공하고, 자동이체를 신청합니다.
 본 상품은 더좋은크루즈의 선불식 할부거래(크루즈 여행) 상품입니다.
 본 상품은 1구좌 기준 총 100회 납입 상품(총액 330만 원)이며, 청약 철회 기간(14일) 이후 해지 시 공정거래위원회 해약환급금 산정 기준 고시에 따라 환급됩니다.
 고객님께서 100회 납입을 모두 완료하고, 완납일로부터 7년을 예치한 후 크루즈 서비스를 이용하지 않고 해약하실 경우, 납입원금의 100%를 전액 환급해 드립니다. 
-단, 만기 및 예치 조건 충족 이전에 해지할 경우, 해지 시점을 기준으로 당사 해약환급률표 및 공정거래위원회 고시에 따라 환급합니다.`, 
-    required: true 
+단, 만기 및 예치 조건 충족 이전에 해지할 경우, 해지 시점을 기준으로 당사 해약환급률표 및 공정거래위원회 고시에 따라 환급합니다.`,
+    required: true
   },
-  { 
-    id: 'privacy', 
-    title: '2. 개인(신용)정보의 수집·이용에 관한 사항(필수)', 
+  {
+    id: 'privacy',
+    title: '2. 개인(신용)정보의 수집·이용에 관한 사항(필수)',
     content: `이용목적
 · 크루즈 여행서비스에 관한 계약이행 및 서비스 제공
 · 가입 고객 관리 및 계약의 체결·유지·관리, 상담(민원처리 등)
@@ -31,12 +31,12 @@ const DEFAULT_TERMS = [
 성명, 주소, 주민번호 앞 6자리(또는 생년월일/성별),전화번호, 계좌번호, 카드정보, 휴대폰번호
 이용기간
 본 계약체결일로부터 계약종료 후 3년까지
-(단, 전자상거래 등에서의 소비자보호에 관한 법률 등 관련 법령의 규정에 의하여 보존할 필요가 있는 경우에는 그에 따름)`, 
-    required: true 
+(단, 전자상거래 등에서의 소비자보호에 관한 법률 등 관련 법령의 규정에 의하여 보존할 필요가 있는 경우에는 그에 따름)`,
+    required: true
   },
-  { 
-    id: 'third_party', 
-    title: '3. 제3자 제공 동의 관한 사항(필수)', 
+  {
+    id: 'third_party',
+    title: '3. 제3자 제공 동의 관한 사항(필수)',
     content: `본 계약과 관련하여 귀사가 본인으로부터 취득한 개인정보는 「개인정보보호법」 제17조와 제22조에 따라 제3자에게 제공할 경우에는 본인의 사전 동의를 얻어야 합니다. 
 이에 본인은 귀사가 본인의 개인정보를 아래와 같이 제3자에게 제공하는 것에 동의합니다.
 · 개인정보를 제공받는 자: 신한은행, 금융결제원, KICC, 더좋은라이프(주), 제휴 크루즈 선사 및 항공사, 제휴 여행사, 신안소프트, 여의도자산관리본부, 위더스앤씨
@@ -45,12 +45,12 @@ const DEFAULT_TERMS = [
 · 제공하는 개인정보의 항목: * 개인식별정보: 성명, 생년월일, 주소(자택/직장), 연락처(휴대폰/자택), 여권정보(행사 진행 시)
 	· 계약정보: 회원번호, 납입내역, 상담내역, 행사/해약사항
 	· 결제정보: 예금주, 생년월일, 연락처, 계약자와의 관계, 계좌·카드 정보
-· 개인정보를 제공받는 자의 개인정보 보유 및 이용기간: 크루즈 여행서비스 계약 종료 시 삭제`, 
-    required: true 
+· 개인정보를 제공받는 자의 개인정보 보유 및 이용기간: 크루즈 여행서비스 계약 종료 시 삭제`,
+    required: true
   },
-  { 
-    id: 'marketing', 
-    title: '4. 마케팅 정보 제공 동의(선택)', 
+  {
+    id: 'marketing',
+    title: '4. 마케팅 정보 제공 동의(선택)',
     content: `이용목적
 · 신규 상품 및 서비스 안내
 · 이벤트, 프로모션, 혜택 정보 제공
@@ -58,8 +58,8 @@ const DEFAULT_TERMS = [
 수집·이용할 개인(신용)정보의 항목
 성명, 주소, 휴대폰번호
 이용기간
-동의일로부터 동의 철회 시까지`, 
-    required: false 
+동의일로부터 동의 철회 시까지`,
+    required: false
   },
 ];
 
@@ -78,11 +78,11 @@ const RegistrationForm = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submittingMessage, setSubmittingMessage] = useState('');
   const [createdDocumentId, setCreatedDocumentId] = useState<string | null>(null);
-  const [theme, setTheme] = useState<'light' | 'dark'>('dark');
+  const [theme, setTheme] = useState<'light' | 'dark'>('light');
   const sigCanvas = useRef<SignatureCanvas>(null);
-  
+
   useEffect(() => {
-    const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' || 'dark';
+    const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' || 'light';
     setTheme(savedTheme);
     document.documentElement.setAttribute('data-theme', savedTheme);
   }, []);
@@ -168,6 +168,15 @@ const RegistrationForm = () => {
         }
       }
     }
+    if (currentStep === 3) { // Terms Agreement step
+      const requiredTerms = DEFAULT_TERMS.filter(t => t.required).map(t => t.id);
+      // @ts-ignore
+      const isAllAgreed = requiredTerms.every(id => formData.agreement[id]);
+      if (!isAllAgreed) {
+        alert('필수 약관에 모두 동의해 주세요.');
+        return;
+      }
+    }
     if (currentStep === 4) { // Signature step
       if (!saveSignature()) return;
     }
@@ -180,6 +189,7 @@ const RegistrationForm = () => {
       return;
     }
     setCurrentStep((prev) => Math.min(prev + 1, STEPS.length - 1));
+    window.scrollTo(0, 0);
   };
 
   const handleBack = () => {
@@ -195,7 +205,6 @@ const RegistrationForm = () => {
         setSubmittingMessage('계약서 PDF를 생성하고 있습니다. 잠시만 기다려 주세요...');
         if (result.documentId) {
           setCreatedDocumentId(result.documentId);
-          // PDF 생성을 위한 최소한의 시간 확보 (2초 뒤 오픈)
           setTimeout(() => {
             window.open(`/api/download?id=${result.documentId}`, '_blank');
           }, 2000);
@@ -220,7 +229,7 @@ const RegistrationForm = () => {
     }
     // @ts-ignore
     new window.daum.Postcode({
-      oncomplete: function(data: any) {
+      oncomplete: function (data: any) {
         updateFormData('address', data.address);
       }
     }).open();
@@ -228,45 +237,30 @@ const RegistrationForm = () => {
 
   return (
     <div className="min-h-screen bg-theme text-theme flex flex-col items-center py-12 px-4 selection:bg-indigo-500/30 transition-colors duration-300">
-      <Script 
-        src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js" 
-        strategy="afterInteractive" 
+      <Script
+        src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"
+        strategy="afterInteractive"
       />
-      
+
       <div className="w-full max-w-xl space-y-10">
-        <div className="flex items-center justify-between px-2">
-          <div className="flex items-center gap-3">
-            <div className="bg-indigo-500/10 p-2.5 rounded-2xl border border-indigo-500/20">
-              <ShieldCheck className="text-indigo-500" size={22} />
-            </div>
-            <div>
-              <p className="text-[10px] text-sub uppercase tracking-widest font-black">Membership System</p>
-              <p className="text-sm font-bold italic">Premium Access Center</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-3">
-            <button
-              type="button"
-              onClick={toggleTheme}
-              className="p-3 rounded-2xl bg-card transition-all hover:scale-110 active:scale-95 border border-theme shadow-sm"
-              aria-label="Toggle Theme"
-            >
-              {theme === 'light' ? <Moon size={20} className="text-zinc-600" /> : <Sun size={20} className="text-yellow-400" />}
-            </button>
-            <div className="px-3 py-1 bg-card border border-theme rounded-full">
-              <span className="text-[10px] text-indigo-500 font-bold uppercase tracking-widest">Step {currentStep + 1} of 7</span>
-            </div>
-          </div>
+        <div className="flex justify-end px-2">
+          <button
+            type="button"
+            onClick={toggleTheme}
+            className="p-3 rounded-2xl bg-card transition-all hover:scale-110 active:scale-95 border border-theme shadow-sm"
+            aria-label="Toggle Theme"
+          >
+            {theme === 'light' ? <Moon size={20} className="text-zinc-600" /> : <Sun size={20} className="text-yellow-400" />}
+          </button>
         </div>
 
         <div className="relative flex justify-between items-center bg-card border border-theme p-3 rounded-[2rem] backdrop-blur-xl">
           {STEPS.slice(0, 6).map((step, idx) => (
             <div key={step.id} className="flex flex-col items-center flex-1 relative z-10">
-              <div className={`w-8 h-8 rounded-xl flex items-center justify-center font-bold transition-all duration-500 ${
-                idx <= currentStep 
-                ? 'bg-gradient-to-br from-indigo-500 to-purple-600 text-white' 
-                : 'bg-theme text-sub border border-theme'
-              }`}>
+              <div className={`w-8 h-8 rounded-xl flex items-center justify-center font-bold transition-all duration-500 ${idx <= currentStep
+                  ? 'bg-gradient-to-br from-indigo-500 to-purple-600 text-white'
+                  : 'bg-theme text-sub border border-theme'
+                }`}>
                 {idx < currentStep ? <CheckCircle2 size={16} /> : <span className="text-xs">{idx + 1}</span>}
               </div>
               <span className={`text-[8px] mt-2 font-bold transition-colors duration-300 ${idx <= currentStep ? 'text-theme' : 'text-sub'}`}>
@@ -301,26 +295,23 @@ const RegistrationForm = () => {
                       <button
                         key={p.id}
                         onClick={() => updateFormData('product', p.id)}
-                        className={`relative p-5 rounded-[2rem] border-2 text-left transition-all duration-300 group overflow-hidden ${
-                          formData.product === p.id 
-                            ? 'bg-indigo-500/10 border-indigo-500 shadow-lg shadow-indigo-500/10' 
+                        className={`relative p-5 rounded-[2rem] border-2 text-left transition-all duration-300 group overflow-hidden ${formData.product === p.id
+                            ? 'bg-indigo-500/10 border-indigo-500 shadow-lg shadow-indigo-500/10'
                             : 'bg-theme border-theme hover:border-indigo-300'
-                        }`}
+                          }`}
                       >
                         <div className="relative z-10">
-                          <p className={`text-[10px] font-black uppercase tracking-tighter mb-1 ${
-                            formData.product === p.id ? 'text-indigo-500' : 'text-sub'
-                          }`}>
+                          <p className={`text-[10px] font-black uppercase tracking-tighter mb-1 ${formData.product === p.id ? 'text-indigo-500' : 'text-sub'
+                            }`}>
                             {p.desc}
                           </p>
-                          <h4 className={`font-bold transition-colors ${
-                            formData.product === p.id ? 'text-theme' : 'text-sub'
-                          }`}>
+                          <h4 className={`font-bold transition-colors ${formData.product === p.id ? 'text-theme' : 'text-sub'
+                            }`}>
                             {p.id}
                           </h4>
                         </div>
                         {formData.product === p.id && (
-                          <motion.div 
+                          <motion.div
                             layoutId="active-product"
                             className="absolute -right-2 -top-2 bg-indigo-500 p-3 rounded-bl-3xl shadow-lg"
                             initial={{ opacity: 0, scale: 0.5 }}
@@ -342,11 +333,10 @@ const RegistrationForm = () => {
                       <button
                         key={n}
                         onClick={() => updateFormData('productCount', n)}
-                        className={`flex-1 py-3 rounded-xl font-bold transition-all ${
-                          formData.productCount === n 
-                            ? 'bg-indigo-600 text-white shadow-sm' 
+                        className={`flex-1 py-3 rounded-xl font-bold transition-all ${formData.productCount === n
+                            ? 'bg-indigo-600 text-white shadow-sm'
                             : 'text-sub hover:text-indigo-500'
-                        }`}
+                          }`}
                       >
                         {n} 구좌
                       </button>
@@ -380,13 +370,13 @@ const RegistrationForm = () => {
                   <div className="flex flex-col gap-3">
                     <div className="relative group">
                       <MapPin className="absolute left-5 top-1/2 -translate-y-1/2 text-sub group-focus-within:text-indigo-500 transition-colors" size={18} />
-                      <input 
-                        type="text" 
-                        placeholder="주소를 검색하려면 여기를 누르세요" 
-                        value={formData.address} 
-                        readOnly 
-                        onClick={openPostcode} 
-                        className="w-full bg-theme border border-theme rounded-2xl py-4.5 pl-14 pr-6 focus:border-indigo-500 transition-all outline-none cursor-pointer text-sm" 
+                      <input
+                        type="text"
+                        placeholder="주소를 검색하려면 여기를 누르세요"
+                        value={formData.address}
+                        readOnly
+                        onClick={openPostcode}
+                        className="w-full bg-theme border border-theme rounded-2xl py-4.5 pl-14 pr-6 focus:border-indigo-500 transition-all outline-none cursor-pointer text-sm"
                       />
                     </div>
                     <input type="text" placeholder="상세 주소를 입력하세요" value={formData.addressDetail} onChange={(e) => updateFormData('addressDetail', e.target.value)} className="w-full bg-theme border border-theme rounded-2xl py-4.5 px-6 focus:border-indigo-500 transition-all outline-none text-sm" />
@@ -439,8 +429,8 @@ const RegistrationForm = () => {
                   <div className="flex justify-between items-center p-4 bg-theme rounded-2xl border border-theme">
                     <span className="text-sub text-xs font-bold">1회차 결제금액</span>
                     <span className="font-black">
-                      {formData.product === '더좋은크루즈' 
-                        ? (990000 * Number(formData.productCount)).toLocaleString() 
+                      {formData.product === '더좋은크루즈'
+                        ? (990000 * Number(formData.productCount)).toLocaleString()
                         : (660000 * Number(formData.productCount)).toLocaleString()
                       }원
                     </span>
@@ -448,15 +438,15 @@ const RegistrationForm = () => {
                   <div className="flex justify-between items-center p-4 bg-theme rounded-2xl border border-theme">
                     <span className="text-sub text-xs font-bold">2회차 이후 월 납입금</span>
                     <span className="font-black text-indigo-500">
-                      {formData.product === '더좋은크루즈' 
-                        ? (33000 * Number(formData.productCount)).toLocaleString() 
+                      {formData.product === '더좋은크루즈'
+                        ? (33000 * Number(formData.productCount)).toLocaleString()
                         : (27000 * Number(formData.productCount)).toLocaleString()
                       }원
                     </span>
                   </div>
                   <p className="text-[10px] text-sub text-right px-2">
-                    {formData.product === '더좋은크루즈' 
-                      ? '* 2회차~71회차까지 납입 (총액 330만원)' 
+                    {formData.product === '더좋은크루즈'
+                      ? '* 2회차~71회차까지 납입 (총액 330만원)'
                       : '* 2회차~101회차까지 납입 (VAT 포함)'
                     }
                   </p>
@@ -490,47 +480,47 @@ const RegistrationForm = () => {
               <div className="space-y-4">
                 {formData.paymentMethod === 'card' ? (
                   <div className="space-y-4">
-                    <div className="space-y-2">
-                      <label className="text-xs font-bold text-sub ml-1 flex items-center gap-2"><CreditCard size={14} /> 카드사</label>
-                      <input type="text" placeholder="예: 현대카드" value={formData.paymentInfo.cardCompany} onChange={(e) => updatePaymentInfo('cardCompany', e.target.value)} className="w-full bg-theme border border-theme rounded-2xl py-4.5 px-6 focus:border-indigo-500 transition-all outline-none" />
-                    </div>
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-[1fr,130px] gap-4">
                       <div className="space-y-2">
-                        <label className="text-xs font-bold text-sub ml-1">카드번호</label>
-                        <input 
-                          type="text" 
-                          placeholder="0000-0000-0000-0000" 
-                          value={formData.paymentInfo.cardNumber} 
-                          onChange={(e) => {
-                            let val = e.target.value.replace(/[^0-9]/g, '');
-                            if (val.length > 16) val = val.substring(0, 16);
-                            
-                            // Formatting 4-4-4-4
-                            let formatted = '';
-                            for (let i = 0; i < val.length; i++) {
-                              if (i > 0 && i % 4 === 0) formatted += '-';
-                              formatted += val[i];
-                            }
-                            updatePaymentInfo('cardNumber', formatted);
-                          }} 
-                          className="w-full bg-theme border border-theme rounded-2xl py-4.5 px-4 focus:border-indigo-500 transition-all outline-none font-mono text-sm sm:text-base tracking-tighter sm:tracking-normal" 
-                        />
+                        <label className="text-xs font-bold text-sub ml-1 flex items-center gap-2"><CreditCard size={14} /> 카드사</label>
+                        <input type="text" placeholder="예: 현대카드" value={formData.paymentInfo.cardCompany} onChange={(e) => updatePaymentInfo('cardCompany', e.target.value)} className="w-full bg-theme border border-theme rounded-2xl py-4.5 px-6 focus:border-indigo-500 transition-all outline-none" />
                       </div>
                       <div className="space-y-2">
                         <label className="text-xs font-bold text-sub ml-1 flex items-center gap-2"><Calendar size={14} /> 유효기간</label>
-                        <input 
-                          type="text" 
-                          placeholder="MM/YY" 
-                          maxLength={5} 
-                          value={formData.paymentInfo.cardExpiry} 
+                        <input
+                          type="text"
+                          placeholder="MM/YY"
+                          maxLength={5}
+                          value={formData.paymentInfo.cardExpiry}
                           onChange={(e) => {
                             let val = e.target.value.replace(/[^0-9]/g, '');
                             if (val.length > 2) val = val.substring(0, 2) + '/' + val.substring(2, 4);
                             updatePaymentInfo('cardExpiry', val);
-                          }} 
-                          className="w-full bg-theme border border-theme rounded-2xl py-4.5 px-6 focus:border-indigo-500 transition-all outline-none" 
+                          }}
+                          className="w-full bg-theme border border-theme rounded-2xl py-4.5 px-6 focus:border-indigo-500 transition-all outline-none"
                         />
                       </div>
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-xs font-bold text-sub ml-1">카드번호</label>
+                      <input
+                        type="text"
+                        placeholder="0000-0000-0000-0000"
+                        value={formData.paymentInfo.cardNumber}
+                        onChange={(e) => {
+                          let val = e.target.value.replace(/[^0-9]/g, '');
+                          if (val.length > 16) val = val.substring(0, 16);
+
+                          // Formatting 4-4-4-4
+                          let formatted = '';
+                          for (let i = 0; i < val.length; i++) {
+                            if (i > 0 && i % 4 === 0) formatted += '-';
+                            formatted += val[i];
+                          }
+                          updatePaymentInfo('cardNumber', formatted);
+                        }}
+                        className="w-full bg-theme border border-theme rounded-2xl py-4.5 px-6 focus:border-indigo-500 transition-all outline-none font-mono text-base tracking-wider"
+                      />
                     </div>
                   </div>
                 ) : (
@@ -549,7 +539,9 @@ const RegistrationForm = () => {
                   <label className="text-xs font-bold text-sub ml-1">매월 결제일</label>
                   <select value={formData.paymentDate} onChange={(e) => updateFormData('paymentDate', e.target.value)} className="w-full bg-theme border border-theme rounded-2xl py-4.5 px-6 focus:border-indigo-500 transition-all outline-none appearance-none">
                     <option value="5">매월 5일</option>
+                    <option value="10">매월 10일</option>
                     <option value="15">매월 15일</option>
+                    <option value="20">매월 20일</option>
                     <option value="25">매월 25일</option>
                   </select>
                 </div>
@@ -668,10 +660,10 @@ const RegistrationForm = () => {
                   <p className="text-indigo-100 text-sm font-medium">잠시 후 계약서 PDF가 자동으로 열립니다.</p>
                 )}
               </div>
-              
+
               <div className="flex flex-col gap-3">
                 {createdDocumentId && (
-                  <button 
+                  <button
                     onClick={() => window.open(`/api/download?id=${createdDocumentId}`, '_blank')}
                     className="w-full py-5 bg-indigo-500 text-white rounded-[2rem] font-black border border-white/20 hover:bg-indigo-400 transition-all flex items-center justify-center gap-2"
                   >
@@ -685,7 +677,7 @@ const RegistrationForm = () => {
         </AnimatePresence>
       </div>
 
-      <footer className="mt-20 text-[10px] text-sub font-bold uppercase tracking-[0.5em] opacity-40 italic">Premium Membership Platform // Advanced Digital Signing</footer>
+      <footer className="mt-20 text-[10px] text-sub font-bold uppercase tracking-[0.5em] opacity-40 italic">Cruise Membership Platform // Secure Digital Registration</footer>
     </div>
   );
 };
