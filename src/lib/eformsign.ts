@@ -94,6 +94,7 @@ export async function createEformsignDocument(data: any) {
 
         const payload: any = {
             document: {
+                template_id: templateId,
                 comment: "가입 신청이 완료되어 서명된 신청서를 보내드립니다.",
                 notification: {
                     use_mail: true,
@@ -114,8 +115,7 @@ export async function createEformsignDocument(data: any) {
                         }
                     }
                 ],
-                fields: fields,
-                select_group_name: ""
+                fields: fields
             }
         };
 
@@ -137,9 +137,14 @@ export async function createEformsignDocument(data: any) {
         }
 
         const result = await response.json();
+        const documentId = result.document?.id || result.document?.document_id || result.document_id || 'unknown';
+        
+        console.log('--- e-FormSign Document Created ---');
+        console.log('ID:', documentId);
+
         return {
             success: true,
-            document_id: result.document?.document_id || 'unknown',
+            document_id: documentId,
             message: '전자 서명이 성공적으로 전송되었습니다.'
         };
     } catch (error: any) {
