@@ -8,17 +8,7 @@ import TermsAgreement from './TermsAgreement';
 import { registerAction } from '@/app/actions';
 import Script from 'next/script';
 
-const DEFAULT_TERMS = [
-  {
-    id: 'product_notice',
-    title: '1. 상품내용 고지에 대한 동의 (필수)',
-    content: `본 신청과 관련하여 계약자 본인은 상기 금융거래정보(카드 정보, 은행, 계좌번호 등)를 만기·해지 신청 때까지 청구 기관에 제공하고, 자동이체를 신청합니다.
-본 상품은 더좋은크루즈의 선불식 할부거래(크루즈 여행) 상품입니다.
-본 상품은 1구좌 기준 총 100회 납입 상품(총액 330만 원)이며, 청약 철회 기간(14일) 이후 해지 시 공정거래위원회 해약환급금 산정 기준 고시에 따라 환급됩니다.
-고객님께서 100회 납입을 모두 완료하고, 완납일로부터 7년을 예치한 후 크루즈 서비스를 이용하지 않고 해약하실 경우, 납입원금의 100%를 전액 환급해 드립니다. 
-단, 만기 및 예치 조건 충족 이전에 해지할 경우, 해지 시점을 기준으로 당사 해약환급률표 및 공정거래위원회 고시에 따라 환급합니다.`,
-    required: true
-  },
+const OTHER_TERMS = [
   {
     id: 'privacy',
     title: '2. 개인(신용)정보의 수집·이용에 관한 사항(필수)',
@@ -169,7 +159,24 @@ const RegistrationForm = () => {
       }
     }
     if (currentStep === 3) { // Terms Agreement step
-      const requiredTerms = DEFAULT_TERMS.filter(t => t.required).map(t => t.id);
+      const currentTerms = [
+        {
+          id: 'product_notice',
+          title: '1. 상품내용 고지에 대한 동의 (필수)',
+          content: formData.product === '좋은건강크루즈' 
+            ? `본 신청과 관련하여 계약자 본인은 상기 금융거래정보(카드 정보, 은행명, 계좌번호 등)를 만기·해지 신청 때까지 청구 기관에 제공하고, 자동이체를 신청합니다.
+본 상품은 더좋은크루즈의 선불식 할부거래(크루즈 여행) 결합 상품인 '좋은건강크루즈330'입니다.
+본 상품은 선결제 금액 60만 원은 건강식품 매매대금으로 대체하며, 이후 월 27,000원씩 총 100회를 납입하는 상품입니다. 청약 철회 기간(14일) 이후 해지시
+공정거래위원회 고시에 따라 환급됩니다. 단, 만기 및 예치 조건 충족 이전에 해지할 경우, 해지 시점을 기준으로 당사 해약환급률표 및 공정거래위원회 고시에 따라 환급합니다.
+고객님께서 100회 납입을 모두 완료하고, 완납일로부터 5년을 예치한 후 크루즈 서비스를 이용하지 않고 해약하실 경우, 납입금액 전액과 건강식품 구매 금액을 포함한 총 330만원을 환급해드립니다.`
+            : `본 신청과 관련하여 계약자 본인은 상기 금융거래정보(카드 정보, 은행명, 계좌번호 등)를 만기·해지 신청 때까지 청구 기관에 제공하고, 자동이체를 신청합니다. 본 상품은 더좋은크루즈의 선불식 할부거래(크루즈 여행) 상품입니다.
+본 상품은 1구좌 기준 총 100회 납입 상품(총액 330만 원)이며, 청약 철회 기간(14일) 이후 해지 시 공정거래위원회 해약환급금 산정 기준 고시에 따라 환급됩니다. 단, 만기 및 예치 조건 충족 이전에 해지할 경우, 해지 시점을 기준으로 당사 해약환급률표 및 공정거래위원회 고시에 따라 환급합니다.
+고객님께서 100회 납입을 모두 완료하고, 완납일로부터 7년을 예치한 후 크루즈 서비스를 이용하지 않고 해약하실 경우, 납입원금의 100%를 전액 환급해 드립니다.`,
+          required: true
+        },
+        ...OTHER_TERMS
+      ];
+      const requiredTerms = currentTerms.filter(t => t.required).map(t => t.id);
       // @ts-ignore
       const isAllAgreed = requiredTerms.every(id => formData.agreement[id]);
       if (!isAllAgreed) {
@@ -431,7 +438,7 @@ const RegistrationForm = () => {
                     <span className="font-black">
                       {formData.product === '더좋은크루즈'
                         ? (990000 * Number(formData.productCount)).toLocaleString()
-                        : (660000 * Number(formData.productCount)).toLocaleString()
+                        : (600000 * Number(formData.productCount)).toLocaleString()
                       }원
                     </span>
                   </div>
@@ -444,12 +451,19 @@ const RegistrationForm = () => {
                       }원
                     </span>
                   </div>
-                  <p className="text-[10px] text-sub text-right px-2">
-                    {formData.product === '더좋은크루즈'
-                      ? '* 2회차~71회차까지 납입 (총액 330만원)'
-                      : '* 2회차~101회차까지 납입 (VAT 포함)'
-                    }
-                  </p>
+                  <div className="space-y-1">
+                    <p className="text-[10px] text-sub text-right px-2">
+                      {formData.product === '더좋은크루즈'
+                        ? '* 2회차~71회차까지 납입 (총액 330만원)'
+                        : '* 2회차~101회차까지 납입'
+                      }
+                    </p>
+                    {formData.product === '좋은건강크루즈' && (
+                      <p className="text-[10px] text-indigo-500 text-right px-2 font-bold italic">
+                        * 1회차 결제금액은 건강식품 구매금액입니다.
+                      </p>
+                    )}
+                  </div>
                 </div>
               </div>
 
@@ -567,7 +581,26 @@ const RegistrationForm = () => {
               </div>
 
               <div className="bg-card border border-theme rounded-[2rem] overflow-hidden max-h-[350px] overflow-y-auto px-4 shadow-inner">
-                <TermsAgreement terms={DEFAULT_TERMS} onAgreementChange={(agreement) => updateFormData('agreement', agreement)} />
+                <TermsAgreement 
+                  terms={[
+                    {
+                      id: 'product_notice',
+                      title: '1. 상품내용 고지에 대한 동의 (필수)',
+                      content: formData.product === '좋은건강크루즈' 
+                        ? `본 신청과 관련하여 계약자 본인은 상기 금융거래정보(카드 정보, 은행명, 계좌번호 등)를 만기·해지 신청 때까지 청구 기관에 제공하고, 자동이체를 신청합니다.
+본 상품은 더좋은크루즈의 선불식 할부거래(크루즈 여행) 결합 상품인 '좋은건강크루즈330'입니다.
+본 상품은 선결제 금액 60만 원은 건강식품 매매대금으로 대체하며, 이후 월 27,000원씩 총 100회를 납입하는 상품입니다. 청약 철회 기간(14일) 이후 해지시
+공정거래위원회 고시에 따라 환급됩니다. 단, 만기 및 예치 조건 충족 이전에 해지할 경우, 해지 시점을 기준으로 당사 해약환급률표 및 공정거래위원회 고시에 따라 환급합니다.
+고객님께서 100회 납입을 모두 완료하고, 완납일로부터 5년을 예치한 후 크루즈 서비스를 이용하지 않고 해약하실 경우, 납입금액 전액과 건강식품 구매 금액을 포함한 총 330만원을 환급해드립니다.`
+                        : `본 신청과 관련하여 계약자 본인은 상기 금융거래정보(카드 정보, 은행명, 계좌번호 등)를 만기·해지 신청 때까지 청구 기관에 제공하고, 자동이체를 신청합니다. 본 상품은 더좋은크루즈의 선불식 할부거래(크루즈 여행) 상품입니다.
+본 상품은 1구좌 기준 총 100회 납입 상품(총액 330만 원)이며, 청약 철회 기간(14일) 이후 해지 시 공정거래위원회 해약환급금 산정 기준 고시에 따라 환급됩니다. 단, 만기 및 예치 조건 충족 이전에 해지할 경우, 해지 시점을 기준으로 당사 해약환급률표 및 공정거래위원회 고시에 따라 환급합니다.
+고객님께서 100회 납입을 모두 완료하고, 완납일로부터 7년을 예치한 후 크루즈 서비스를 이용하지 않고 해약하실 경우, 납입원금의 100%를 전액 환급해 드립니다.`,
+                      required: true
+                    },
+                    ...OTHER_TERMS
+                  ]} 
+                  onAgreementChange={(agreement) => updateFormData('agreement', agreement)} 
+                />
               </div>
 
               <div className="flex gap-3 pt-4">
