@@ -458,11 +458,11 @@ const RegistrationForm = () => {
                         : '* 2회차~101회차까지 납입'
                       }
                     </p>
-                    {formData.product === '좋은건강크루즈' && (
+                    {/* formData.product === '좋은건강크루즈' && (
                       <p className="text-[10px] text-indigo-500 text-right px-2 font-bold italic">
                         * 1회차 결제금액은 건강식품 구매금액입니다.
                       </p>
-                    )}
+                    ) */}
                   </div>
                 </div>
               </div>
