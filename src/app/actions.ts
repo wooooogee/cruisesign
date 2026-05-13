@@ -36,6 +36,8 @@ export async function registerAction(data: any) {
       '예금주': data.paymentInfo.accountHolder || data.name,
       '영업소속': data.salesAffiliation,
       '영업담당': `${data.salesName} (${data.salesPhone})`,
+      '대상자1': data.healthcareRecipients[0]?.name ? `${data.healthcareRecipients[0].name} ${data.healthcareRecipients[0].birthdate}-${data.healthcareRecipients[0].gender === '남' ? '1' : '2'} ${formatPhone(data.healthcareRecipients[0].phone)}` : '',
+      '대상자2': data.healthcareRecipients[1]?.name ? `${data.healthcareRecipients[1].name} ${data.healthcareRecipients[1].birthdate}-${data.healthcareRecipients[1].gender === '남' ? '1' : '2'} ${formatPhone(data.healthcareRecipients[1].phone)}` : '',
       '서명': data.signature ? '전자서명 완료' : '미완료',
       '상태': '등록완료'
     };

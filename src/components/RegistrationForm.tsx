@@ -550,11 +550,11 @@ const RegistrationForm = () => {
 
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-1.5">
-                        <label className="text-[10px] font-bold text-sub ml-1">생년월일(6자리)</label>
+                        <label className="text-[10px] font-bold text-sub ml-1">생년월일(8자리)</label>
                         <input 
                           type="text" 
-                          placeholder="900101" 
-                          maxLength={6}
+                          placeholder="19900101" 
+                          maxLength={8}
                           value={formData.healthcareRecipients[idx].birthdate} 
                           onChange={(e) => {
                             const newRecipients = formData.healthcareRecipients.map((r, i) => 
