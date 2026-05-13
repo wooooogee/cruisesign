@@ -11,7 +11,12 @@ function formatPhone(phone: string = '') {
   } else if (nums.length === 10) {
     return nums.replace(/(\d{3})(\d{3})(\d{4})/, '$1-$2-$3');
   }
-  return phone;
+// Utility: Format Full Birthdate with Gender Code (6 digits -> 8 digits-G)
+function formatFullBirthdate(yymmdd: string, gender: string) {
+  if (!yymmdd || yymmdd.length !== 6) return yymmdd;
+  const yearPrefix = parseInt(yymmdd.substring(0, 2)) > 30 ? '19' : '20';
+  const genderCode = gender === '남' ? (yearPrefix === '19' ? '1' : '3') : (yearPrefix === '19' ? '2' : '4');
+  return `${yearPrefix}${yymmdd}-${genderCode}`;
 }
 
 export async function registerAction(data: any) {
@@ -36,8 +41,8 @@ export async function registerAction(data: any) {
       '예금주': data.paymentInfo.accountHolder || data.name,
       '영업소속': data.salesAffiliation,
       '영업담당': `${data.salesName} (${data.salesPhone})`,
-      '대상자1': data.healthcareRecipients[0]?.name ? `${data.healthcareRecipients[0].name} ${data.healthcareRecipients[0].birthdate}-${data.healthcareRecipients[0].gender === '남' ? '1' : '2'} ${formatPhone(data.healthcareRecipients[0].phone)}` : '',
-      '대상자2': data.healthcareRecipients[1]?.name ? `${data.healthcareRecipients[1].name} ${data.healthcareRecipients[1].birthdate}-${data.healthcareRecipients[1].gender === '남' ? '1' : '2'} ${formatPhone(data.healthcareRecipients[1].phone)}` : '',
+      '대상자1': data.healthcareRecipients[0]?.name ? `${data.healthcareRecipients[0].name} ${formatFullBirthdate(data.healthcareRecipients[0].birthdate, data.healthcareRecipients[0].gender)} ${formatPhone(data.healthcareRecipients[0].phone)}` : '',
+      '대상자2': data.healthcareRecipients[1]?.name ? `${data.healthcareRecipients[1].name} ${formatFullBirthdate(data.healthcareRecipients[1].birthdate, data.healthcareRecipients[1].gender)} ${formatPhone(data.healthcareRecipients[1].phone)}` : '',
       '서명': data.signature ? '전자서명 완료' : '미완료',
       '상태': '등록완료'
     };
