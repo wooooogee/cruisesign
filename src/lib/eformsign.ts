@@ -89,7 +89,18 @@ export async function createEformsignDocument(data: any) {
             { id: '계약자', value: data.name },
             { id: '영업자소속', value: data.salesAffiliation || '' },
             { id: '영업자성명', value: data.salesName || '' },
-            { id: '영업자연락처', value: data.salesPhone || '' }
+            { id: '영업자연락처', value: data.salesPhone || '' },
+            // Healthcare Recipients
+            { id: '대상자1_관계', value: data.healthcareRecipients[0]?.relationship || '' },
+            { id: '대상자1_성명', value: data.healthcareRecipients[0]?.name || '' },
+            { id: '대상자1_생년월일', value: data.healthcareRecipients[0]?.birthdate || '' },
+            { id: '대상자1_성별', value: data.healthcareRecipients[0]?.gender || '' },
+            { id: '대상자1_연락처', value: data.healthcareRecipients[0]?.phone || '' },
+            { id: '대상자2_관계', value: data.healthcareRecipients[1]?.relationship || '' },
+            { id: '대상자2_성명', value: data.healthcareRecipients[1]?.name || '' },
+            { id: '대상자2_생년월일', value: data.healthcareRecipients[1]?.birthdate || '' },
+            { id: '대상자2_성별', value: data.healthcareRecipients[1]?.gender || '' },
+            { id: '대상자2_연락처', value: data.healthcareRecipients[1]?.phone || '' }
         ];
 
         const payload: any = {
