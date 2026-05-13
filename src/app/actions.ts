@@ -11,6 +11,9 @@ function formatPhone(phone: string = '') {
   } else if (nums.length === 10) {
     return nums.replace(/(\d{3})(\d{3})(\d{4})/, '$1-$2-$3');
   }
+  return phone;
+}
+
 // Utility: Format Full Birthdate with Gender Code (6 digits -> 8 digits-G)
 function formatFullBirthdate(yymmdd: string, gender: string) {
   if (!yymmdd || yymmdd.length !== 6) return yymmdd;
