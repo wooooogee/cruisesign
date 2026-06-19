@@ -38,7 +38,7 @@ export async function registerAction(data: any) {
       '수량': data.productCount + '구좌',
       '플랜': data.paymentPlan === 'normal' ? '일반 납입' : '30회 선납',
       '결제수단': data.paymentMethod === 'card' ? '카드' : 'CMS(계좌)',
-      '결제기관': data.paymentMethod === 'card' ? data.paymentInfo.cardCompany : data.paymentInfo.bankName,
+      '결제기관': data.paymentMethod === 'card' ? `${data.paymentInfo.cardCompany}${data.paymentInfo.installment ? ` (할부: ${data.paymentInfo.installment}개월)` : ''}` : data.paymentInfo.bankName,
       '계좌/카드번호': data.paymentMethod === 'card' ? data.paymentInfo.cardNumber : data.paymentInfo.accountNumber,
       '유효기간': data.paymentMethod === 'card' ? data.paymentInfo.cardExpiry : '-',
       '예금주': data.paymentInfo.accountHolder || data.name,

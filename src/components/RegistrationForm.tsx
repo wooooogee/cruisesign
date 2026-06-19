@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { User, Phone, CheckCircle2, ArrowRight, ArrowLeft, Loader2, CreditCard, Landmark, ShieldCheck, MapPin, Search, Eraser, PenLine, Package, Calculator, Briefcase, Calendar, Sun, Moon, FileText } from 'lucide-react';
+import { User, Phone, CheckCircle2, ArrowRight, ArrowLeft, Loader2, CreditCard, Landmark, ShieldCheck, MapPin, Search, Eraser, PenLine, Package, Calculator, Briefcase, Calendar, Sun, Moon, FileText, Info, X } from 'lucide-react';
 import SignatureCanvas from 'react-signature-canvas';
 import TermsAgreement from './TermsAgreement';
 import { registerAction } from '@/app/actions';
@@ -70,6 +70,7 @@ const RegistrationForm = () => {
   const [submittingMessage, setSubmittingMessage] = useState('');
   const [createdDocumentId, setCreatedDocumentId] = useState<string | null>(null);
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
+  const [showInstallmentGuide, setShowInstallmentGuide] = useState(false);
   const sigCanvas = useRef<SignatureCanvas>(null);
 
   useEffect(() => {
@@ -103,6 +104,7 @@ const RegistrationForm = () => {
       bankName: '',
       accountNumber: '',
       accountHolder: '',
+      installment: '',
     },
     agreement: {},
     signature: '', // Base64 signature
@@ -665,26 +667,47 @@ const RegistrationForm = () => {
                         />
                       </div>
                     </div>
-                    <div className="space-y-2">
-                      <label className="text-xs font-bold text-sub ml-1">카드번호</label>
-                      <input
-                        type="text"
-                        placeholder="0000-0000-0000-0000"
-                        value={formData.paymentInfo.cardNumber}
-                        onChange={(e) => {
-                          let val = e.target.value.replace(/[^0-9]/g, '');
-                          if (val.length > 16) val = val.substring(0, 16);
+                    <div className="grid grid-cols-[1fr,130px] gap-4">
+                      <div className="space-y-2">
+                        <label className="text-xs font-bold text-sub ml-1">카드번호</label>
+                        <input
+                          type="text"
+                          placeholder="0000-0000-0000-0000"
+                          value={formData.paymentInfo.cardNumber}
+                          onChange={(e) => {
+                            let val = e.target.value.replace(/[^0-9]/g, '');
+                            if (val.length > 16) val = val.substring(0, 16);
 
-                          // Formatting 4-4-4-4
-                          let formatted = '';
-                          for (let i = 0; i < val.length; i++) {
-                            if (i > 0 && i % 4 === 0) formatted += '-';
-                            formatted += val[i];
-                          }
-                          updatePaymentInfo('cardNumber', formatted);
-                        }}
-                        className="w-full bg-theme border border-theme rounded-2xl py-4.5 px-6 focus:border-indigo-500 transition-all outline-none font-mono text-base tracking-wider"
-                      />
+                            // Formatting 4-4-4-4
+                            let formatted = '';
+                            for (let i = 0; i < val.length; i++) {
+                              if (i > 0 && i % 4 === 0) formatted += '-';
+                              formatted += val[i];
+                            }
+                            updatePaymentInfo('cardNumber', formatted);
+                          }}
+                          className="w-full bg-theme border border-theme rounded-2xl py-4.5 px-6 focus:border-indigo-500 transition-all outline-none font-mono text-base tracking-wider"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-xs font-bold text-sub ml-1 flex items-center justify-between">
+                          <span>할부(개월)</span>
+                          <button type="button" onClick={() => setShowInstallmentGuide(true)} className="text-indigo-500 hover:bg-indigo-50 p-1 rounded-full transition-colors" title="무이자 할부 안내">
+                            <Info size={14} />
+                          </button>
+                        </label>
+                        <input
+                          type="text"
+                          placeholder="일시불 0"
+                          value={formData.paymentInfo.installment || ''}
+                          onChange={(e) => {
+                            let val = e.target.value.replace(/[^0-9]/g, '');
+                            if (val.length > 2) val = val.substring(0, 2);
+                            updatePaymentInfo('installment', val);
+                          }}
+                          className="w-full bg-theme border border-theme rounded-2xl py-4.5 px-6 focus:border-indigo-500 transition-all outline-none text-center"
+                        />
+                      </div>
                     </div>
                   </div>
                 ) : (
@@ -859,6 +882,103 @@ const RegistrationForm = () => {
           )}
         </AnimatePresence>
       </div>
+
+      <AnimatePresence>
+        {showInstallmentGuide && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+            onClick={() => setShowInstallmentGuide(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+              className="w-full max-w-md bg-white rounded-[2rem] overflow-hidden shadow-2xl relative"
+            >
+              <div className="bg-gradient-to-r from-blue-600 to-indigo-700 p-5 text-center relative">
+                <button onClick={() => setShowInstallmentGuide(false)} className="absolute right-4 top-4 text-white/80 hover:text-white transition-colors">
+                  <X size={24} />
+                </button>
+                <h3 className="text-white text-xl font-black tracking-tight flex items-center justify-center gap-2">
+                  <CreditCard size={24} />
+                  무이자 할부 안내
+                </h3>
+              </div>
+              <div className="p-6 space-y-5">
+                <div className="bg-blue-50 rounded-xl p-4 text-sm flex gap-3 border border-blue-100">
+                  <div className="bg-blue-600 text-white text-xs font-bold px-2 py-1 rounded whitespace-nowrap h-fit">대상카드</div>
+                  <div className="text-slate-700 font-medium leading-relaxed">
+                    BC / 신한 / 삼성 / 현대 / 국민 / 농협 / 하나 / 롯데 / 우리<br />
+                    <span className="text-slate-500 text-xs">(법인(기업), 체크, 선불, 기프트카드 제외)</span>
+                  </div>
+                </div>
+                
+                <div className="border border-slate-200 rounded-xl overflow-hidden">
+                  <div className="grid grid-cols-2 bg-blue-600 text-white text-sm font-bold text-center">
+                    <div className="py-3 border-r border-white/20">카드사</div>
+                    <div className="py-3">무이자 할부 기간</div>
+                  </div>
+                  <div className="divide-y divide-slate-100 text-sm text-center">
+                    <div className="grid grid-cols-2 items-center bg-white">
+                      <div className="py-4 border-r border-slate-100 flex flex-col gap-1 items-center justify-center">
+                        <span className="font-bold text-slate-800">BC</span>
+                        <span className="text-[10px] text-slate-400 px-2 leading-tight">
+                          우리, IBK, 농협, SC, 대구, 부산, 경남, 신한, 하나, KB국민, 씨티
+                        </span>
+                      </div>
+                      <div className="py-4 font-bold text-blue-600 text-base">2~5개월</div>
+                    </div>
+                    <div className="grid grid-cols-2 items-center bg-white">
+                      <div className="py-3 border-r border-slate-100 font-bold text-slate-800">우리</div>
+                      <div className="py-3 font-bold text-blue-600 text-base">2~5개월</div>
+                    </div>
+                    <div className="grid grid-cols-2 items-center bg-white">
+                      <div className="py-3 border-r border-slate-100 font-bold text-slate-800">롯데</div>
+                      <div className="py-3 font-bold text-blue-600 text-base">2~5개월</div>
+                    </div>
+                    <div className="grid grid-cols-2 items-center bg-slate-50/50">
+                      <div className="py-3 border-r border-slate-100 font-bold text-slate-800">국민</div>
+                      <div className="py-3 font-bold text-teal-600 text-base">2~3개월</div>
+                    </div>
+                    <div className="grid grid-cols-2 items-center bg-slate-50/50">
+                      <div className="py-3 border-r border-slate-100 font-bold text-slate-800">현대</div>
+                      <div className="py-3 font-bold text-teal-600 text-base">2~3개월</div>
+                    </div>
+                    <div className="grid grid-cols-2 items-center bg-slate-50/50">
+                      <div className="py-3 border-r border-slate-100 font-bold text-slate-800">하나</div>
+                      <div className="py-3 font-bold text-teal-600 text-base">2~3개월</div>
+                    </div>
+                    <div className="grid grid-cols-2 items-center bg-slate-50/50">
+                      <div className="py-3 border-r border-slate-100 font-bold text-slate-800">신한</div>
+                      <div className="py-3 font-bold text-teal-600 text-base">2~3개월</div>
+                    </div>
+                    <div className="grid grid-cols-2 items-center bg-slate-50/50">
+                      <div className="py-3 border-r border-slate-100 font-bold text-slate-800">삼성</div>
+                      <div className="py-3 font-bold text-teal-600 text-base">2~3개월</div>
+                    </div>
+                    <div className="grid grid-cols-2 items-center bg-amber-50/30">
+                      <div className="py-3 border-r border-slate-100 font-bold text-slate-800">농협</div>
+                      <div className="py-3 font-bold text-amber-600 text-base">2~6개월</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-slate-50 rounded-xl p-4 flex gap-3 text-xs text-slate-500 border border-slate-100">
+                  <div className="bg-slate-200 text-slate-600 w-5 h-5 rounded-full flex items-center justify-center font-bold shrink-0">i</div>
+                  <div className="space-y-1">
+                    <p>※ 무이자 할부는 카드사 정책에 따라 변동될 수 있습니다.</p>
+                    <p>※ 일부 카드 및 가맹점 사정에 따라 제외될 수 있습니다.</p>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <footer className="mt-20 text-[10px] text-sub font-bold uppercase tracking-[0.5em] opacity-40 italic">Cruise Membership Platform // Secure Digital Registration</footer>
     </div>

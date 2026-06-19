@@ -77,7 +77,7 @@ export async function createEformsignDocument(data: any) {
             { id: '주소', value: `${data.address} ${data.addressDetail || ''}`.trim() },
             { id: '휴대폰', value: data.phone },
             { id: '결제방법', value: data.paymentMethod === 'card' ? '카드' : 'CMS(계좌)' },
-            { id: '카드/은행명', value: data.paymentMethod === 'card' ? (data.paymentInfo?.cardCompany || '') : (data.paymentInfo?.bankName || '') },
+            { id: '카드/은행명', value: data.paymentMethod === 'card' ? ((data.paymentInfo?.cardCompany || '') + (data.paymentInfo?.installment ? ` (할부: ${data.paymentInfo.installment}개월)` : '')) : (data.paymentInfo?.bankName || '') },
             { id: '카드번호/계좌번호', value: data.paymentMethod === 'card' ? (data.paymentInfo?.cardNumber || '') : (data.paymentInfo?.accountNumber || '') },
             { id: '유효기간', value: (data.paymentMethod === 'card' && data.paymentInfo?.cardExpiry) ? data.paymentInfo.cardExpiry : '-' },
             { id: '상품내용고지', value: data.agreement?.product_notice ? '1' : '' },
